@@ -129,6 +129,35 @@
   }
 }
 
+.dontShowAgain {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.dontShowAgainButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.dontShowAgainText {
+  color: #666;
+  text-decoration: underline;
+  margin: 0;
+
+  &:hover {
+    color: #888;
+  }
+}
+
 .fileSelection {
   width: 100%;
 }

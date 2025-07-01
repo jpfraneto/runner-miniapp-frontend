@@ -1,9 +1,11 @@
 // src/shared/layouts/AppLayout/index.tsx
 
 import React from "react";
+import { useLocation } from "react-router-dom";
 
 // Components
 // import NavigationBar from "@/components/NavigationBar";
+import RunnerNavigationBar from "@/shared/components/NavigationBar/RunnerNavigationBar";
 
 // StyleSheet
 import styles from "./AppLayout.module.scss";
@@ -17,16 +19,18 @@ interface AppLayoutProps {
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   // const { data: user } = useAuth();
+  const location = useLocation();
+  const isMiniApp = location.pathname.startsWith("/miniapp");
 
   return (
     <div className={styles.layout}>
       <div className={styles.content}>{children}</div>
 
-      {/* {user && (
+      {isMiniApp && (
         <div className={styles.bar}>
-          <NavigationBar />
+          <RunnerNavigationBar />
         </div>
-      )} */}
+      )}
     </div>
   );
 };

@@ -17,6 +17,7 @@ import PodiumPage from "@/pages/PodiumPage";
 import LeaderboardPage from "@/pages/LeaderboardPage";
 import RankingPage from "@/pages/RankingPage";
 import LoginPage from "@/pages/LoginPage";
+import MiniappPage from "@/pages/MiniappPage";
 
 /**
  * Router configuration for Farcaster miniapp.
@@ -59,6 +60,7 @@ export const router = createBrowserRouter([
       { path: "/ranking", element: <RankingPage /> },
       { path: "/runs/:runId", element: <RunDetailPage /> },
       { path: "/login", element: <LoginPage /> },
+      { path: "/miniapp", element: <MiniappPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

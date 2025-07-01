@@ -33,8 +33,8 @@ function WorkoutPage(): React.ReactNode {
   const handleLogWorkout = () => {
     // Open custom workout image selection modal
     openModal(ModalsIds.WORKOUT_IMAGE_SELECTION, {
-      title: "Log Your Workout",
-      message: "Select images from your device to share your workout progress.",
+      title: "log your run",
+      message: "Select images from your device to share your run progress.",
       onImageSelect: handleImageSelection,
     });
   };
@@ -62,7 +62,7 @@ function WorkoutPage(): React.ReactNode {
       // Show success message
       openModal(ModalsIds.BOTTOM_ALERT, {
         title: "Workout Logged!",
-        content: "Your workout has been successfully shared on Farcaster.",
+        content: "Your run has been successfully shared on Farcaster.",
       });
     } catch (error) {
       console.error("Error uploading images or composing cast:", error);

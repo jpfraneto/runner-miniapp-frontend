@@ -4,7 +4,6 @@ import classNames from "clsx";
 
 // StyleSheet
 import styles from "./Button.module.scss";
-import Typography from "../Typography";
 
 interface ButtonProps {
   variant?: "primary" | "secondary" | "outline" | "underline";
@@ -33,16 +32,7 @@ const Button: React.FC<ButtonProps> = ({
     <div className={styles.container}>
       {variant === "primary" && <span className={styles.effect} />}
       {iconLeft && <div className={styles.icon}>{iconLeft}</div>}
-      <div className={styles.caption}>
-        <Typography
-          variant={"geist"}
-          weight={"medium"}
-          size={16}
-          lineHeight={20}
-        >
-          {caption}
-        </Typography>
-      </div>
+      <div className={styles.caption}>{caption}</div>
       {iconRight && <div className={styles.icon}>{iconRight}</div>}
     </div>
   </button>

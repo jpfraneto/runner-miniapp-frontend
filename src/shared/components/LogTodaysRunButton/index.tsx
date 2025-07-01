@@ -11,8 +11,15 @@ import { useTodaysMission } from "@/shared/hooks/user/useTodaysMission";
 
 // Types
 import { CompletedRun } from "@/shared/hooks/user/useUploadWorkout";
+import { router } from "@/config/router";
 
-const LogTodaysRunButton = () => {
+const LogTodaysRunButton = ({
+  isInsideMiniapp,
+  setIsInsideMiniapp,
+}: {
+  isInsideMiniapp: boolean;
+  setIsInsideMiniapp: (isInsideMiniapp: boolean) => void;
+}) => {
   const [showUploadFlow, setShowUploadFlow] = useState(false);
 
   // Hooks
@@ -50,9 +57,12 @@ const LogTodaysRunButton = () => {
       <div className={styles.quickActions}>
         <Button
           variant="primary"
-          onClick={() => {}}
-          caption="✅ Run Logged Today"
-          disabled
+          onClick={() => {
+            sdk.haptics.selectionChanged();
+            setIsInsideMiniapp(true);
+            router.navigate("/miniapp");
+          }}
+          caption="Open Miniapp"
           className={styles.logRunButton}
         />
       </div>
@@ -64,7 +74,7 @@ const LogTodaysRunButton = () => {
       <div className={styles.quickActions}>
         <Button
           variant="primary"
-          caption="📱 Log Your Workout"
+          caption="📱 log a run"
           onClick={() => {
             sdk.haptics.selectionChanged();
             setShowUploadFlow(true);

@@ -175,6 +175,23 @@ export const getTodaysMission = async (): Promise<TodaysMissionResponse> =>
   );
 
 /**
+ * Gets the user's workout history
+ *
+ * @returns Promise with the user's workout history
+ */
+export const getWorkoutHistory = async (): Promise<{
+  success: boolean;
+  data: CompletedRun[];
+  message: string;
+}> =>
+  await request<{ success: boolean; data: CompletedRun[]; message: string }>(
+    `${USER_SERVICE}/workouts`,
+    {
+      method: "GET",
+    }
+  );
+
+/**
  * Uploads workout screenshots and processes them with AI
  *
  * @param data - Object containing screenshots and optional metadata

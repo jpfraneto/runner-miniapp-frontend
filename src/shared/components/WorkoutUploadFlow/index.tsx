@@ -1,5 +1,5 @@
 // Dependencies
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import sdk from "@farcaster/frame-sdk";
@@ -8,6 +8,7 @@ import sdk from "@farcaster/frame-sdk";
 import Typography from "../Typography";
 import Button from "../Button";
 import IconButton from "../IconButton";
+import WorkoutHistory from "../WorkoutHistory";
 
 // Hooks
 import {
@@ -39,7 +40,8 @@ type UploadState =
   | "uploading"
   | "processing"
   | "verification"
-  | "error";
+  | "error"
+  | "not_workout_image"; // New state for non-workout images
 
 const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
   onComplete,
@@ -53,9 +55,19 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
     useState<ExtractedWorkoutData | null>(null);
   const [completedRun, setCompletedRun] = useState<CompletedRun | null>(null);
   const [error, setError] = useState<string>("");
+  const [nonWorkoutMessage, setNonWorkoutMessage] = useState<string>(""); // New state for fun messages
   const [uploadInProgress, setUploadInProgress] = useState(false);
   const [lastUploadHash, setLastUploadHash] = useState<string>("");
+  const [showInstructions, setShowInstructions] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Check local storage for user preference
+  useEffect(() => {
+    const hideInstructions = localStorage.getItem("hideWorkoutInstructions");
+    if (hideInstructions === "true") {
+      setShowInstructions(false);
+    }
+  }, []);
 
   // Hooks
   const uploadWorkout = useUploadWorkout();
@@ -70,44 +82,58 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
   }, []);
 
   // File validation
-  const validateFiles = useCallback((files: File[]): File[] => {
-    const validFiles = files.filter((file) => {
-      const isValidType = file.type.match(/^image\/(jpeg|jpg|png|webp)$/);
-      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
-      return isValidType && isValidSize;
-    });
+  const validateFiles = useCallback(
+    (files: File[], existingFiles: File[] = []): File[] => {
+      const validFiles = files.filter((file) => {
+        const isValidType = file.type.match(/^image\/(jpeg|jpg|png|webp)$/);
+        const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
+        return isValidType && isValidSize;
+      });
 
-    if (validFiles.length !== files.length) {
-      sdk.haptics.notificationOccurred("error");
-      setError(
-        "Some files were invalid. Only JPEG, PNG, and WebP images under 10MB are allowed."
-      );
-      return [];
-    }
+      if (validFiles.length !== files.length) {
+        sdk.haptics.notificationOccurred("error");
+        setError(
+          "Some files were invalid. Only JPEG, PNG, and WebP images under 10MB are allowed."
+        );
+        return [];
+      }
 
-    if (validFiles.length > 4) {
-      sdk.haptics.notificationOccurred("error");
-      setError("Maximum 4 screenshots allowed.");
-      return [];
-    }
+      const totalFiles = existingFiles.length + validFiles.length;
+      if (totalFiles > 4) {
+        sdk.haptics.notificationOccurred("error");
+        setError(
+          `Maximum 4 screenshots allowed. You can add ${
+            4 - existingFiles.length
+          } more.`
+        );
+        return [];
+      }
 
-    return validFiles;
-  }, []);
+      return validFiles;
+    },
+    []
+  );
 
   // File selection handler
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files || []);
-      const validFiles = validateFiles(files);
+      const validFiles = validateFiles(files, selectedFiles);
 
       if (validFiles.length > 0) {
-        setSelectedFiles(validFiles);
+        // Append new files to existing ones, ensuring we don't exceed 4 files
+        setSelectedFiles((prevFiles) => {
+          const combinedFiles = [...prevFiles, ...validFiles];
+          // Keep only the first 4 files if we exceed the limit
+          return combinedFiles.slice(0, 4);
+        });
         setUploadState("selecting");
         setError("");
+        setNonWorkoutMessage(""); // Clear any previous non-workout messages
         sdk.haptics.selectionChanged();
       }
     },
-    [validateFiles]
+    [validateFiles, selectedFiles]
   );
 
   // Upload handler
@@ -133,6 +159,7 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
     setUploadInProgress(true);
     setUploadState("uploading");
     setError("");
+    setNonWorkoutMessage("");
     sdk.haptics.impactOccurred("medium");
 
     // Simulate progress updates
@@ -153,26 +180,57 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
       };
 
       const result = await uploadWorkout.mutateAsync(uploadData);
+      console.log("************************************************** ");
+      console.log("************************************************** ");
+      console.log("************************************************** ");
+      console.log("************************************************** ");
+      console.log("UPLOAD RESULT ::: ", JSON.stringify(result, null, 2));
+      console.log("************************************************** ");
+      console.log("************************************************** ");
+      console.log("************************************************** ");
+      console.log("************************************************** ");
 
       clearInterval(progressInterval);
       setUploadProgress(100);
 
-      // Success - store the hash
-      setLastUploadHash(uploadHash);
-      setExtractedData(result.data.extractedData);
-      setCompletedRun(result.data.completedRun);
+      // Check if the uploaded images were not workout images
+      if (result.data.extractedData.isWorkoutImage === false) {
+        console.log("Non-workout image detected:", result.data.extractedData);
+        setNonWorkoutMessage(
+          result.data.extractedData.errorMessage ||
+            "🏃‍♂️ That doesn't look like a workout screenshot! Try uploading images from your running app instead."
+        );
+        setUploadState("not_workout_image");
+        sdk.haptics.notificationOccurred("warning");
+        return;
+      }
 
-      // Success feedback
-      sdk.haptics.notificationOccurred("success");
+      // Only proceed if we have valid workout data
+      if (result.data.extractedData.confidence > 0) {
+        // Success - store the hash
+        setLastUploadHash(uploadHash);
+        setExtractedData(result.data.extractedData);
+        setCompletedRun(result.data.completedRun);
 
-      // Navigate to run detail page with celebration state
-      navigate(`/runs/${result.data.completedRun.id}`, {
-        state: { fromUpload: true },
-      });
+        // Success feedback
+        sdk.haptics.notificationOccurred("success");
 
-      // Call onComplete callback if provided
-      if (onComplete) {
-        onComplete(result.data.completedRun);
+        // Navigate to run detail page with celebration state
+        navigate(`/runs/${result.data.completedRun.id}`, {
+          state: { fromUpload: true },
+        });
+
+        // Call onComplete callback if provided
+        if (onComplete) {
+          onComplete(result.data.completedRun);
+        }
+      } else {
+        // Handle case where confidence is 0 (no valid data extracted)
+        setError(
+          "Failed to extract workout data. Please try with clearer screenshots."
+        );
+        setUploadState("error");
+        sdk.haptics.notificationOccurred("error");
       }
     } catch (error) {
       clearInterval(progressInterval);
@@ -189,6 +247,8 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
     uploadInProgress,
     lastUploadHash,
     createUploadHash,
+    navigate,
+    onComplete,
   ]);
 
   // Verification handler
@@ -222,9 +282,29 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
     setExtractedData(null);
     setCompletedRun(null);
     setError("");
+    setNonWorkoutMessage("");
     setUploadState("initial");
     setUploadInProgress(false);
     setLastUploadHash("");
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    sdk.haptics.selectionChanged();
+  }, []);
+
+  // Try again with new images handler
+  const handleTryAgain = useCallback(() => {
+    setSelectedFiles([]);
+    setUploadProgress(0);
+    setExtractedData(null);
+    setCompletedRun(null);
+    setError("");
+    setNonWorkoutMessage("");
+    setUploadState("initial");
+    setUploadInProgress(false);
+    // Don't reset lastUploadHash to prevent the same files from being uploaded again
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -259,6 +339,13 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
     return "Low";
   };
 
+  // Handle "don't show again" preference
+  const handleDontShowAgain = () => {
+    localStorage.setItem("hideWorkoutInstructions", "true");
+    setShowInstructions(false);
+    sdk.haptics.selectionChanged();
+  };
+
   return (
     <div className={styles.container}>
       {/* Hidden file input */}
@@ -279,7 +366,7 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
           size={24}
           className={styles.title}
         >
-          Share Your Workout
+          Share Your Run
         </Typography>
         {onClose && (
           <IconButton
@@ -321,39 +408,124 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
               exit={{ opacity: 0, x: -20 }}
               className={styles.initialState}
             >
-              <div className={styles.uploadPrompt}>
-                <div className={styles.uploadIcon}>📱</div>
+              {showInstructions ? (
+                <div className={styles.uploadPrompt}>
+                  <div className={styles.uploadIcon}>📱</div>
+                  <Typography
+                    variant="geist"
+                    weight="medium"
+                    size={18}
+                    className={styles.uploadTitle}
+                  >
+                    Upload Your Run Screenshots
+                  </Typography>
+                  <Typography
+                    variant="geist"
+                    weight="regular"
+                    size={14}
+                    className={styles.uploadDescription}
+                  >
+                    Take screenshots from your running app and our AI will
+                    extract your run data to share with the community
+                  </Typography>
+                  <div className={styles.uploadTips}>
+                    <Typography
+                      variant="geist"
+                      weight="medium"
+                      size={12}
+                      className={styles.tipsTitle}
+                    >
+                      💡 Tips for best results:
+                    </Typography>
+                    <ul className={styles.tipsList}>
+                      <li>Take screenshots of your run summary</li>
+                      <li>Include distance, time, and pace information</li>
+                      <li>Make sure text is clearly visible</li>
+                      <li>Upload up to 4 screenshots</li>
+                    </ul>
+                  </div>
+                  <div className={styles.dontShowAgain}>
+                    <button
+                      onClick={handleDontShowAgain}
+                      className={styles.dontShowAgainButton}
+                    >
+                      <Typography
+                        variant="geist"
+                        weight="regular"
+                        size={12}
+                        className={styles.dontShowAgainText}
+                      >
+                        Don't show this screen again
+                      </Typography>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <WorkoutHistory />
+              )}
+            </motion.div>
+          )}
+
+          {/* Non-Workout Image State */}
+          {uploadState === "not_workout_image" && (
+            <motion.div
+              key="not_workout_image"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className={styles.notWorkoutState}
+            >
+              <div className={styles.notWorkoutPrompt}>
+                <div className={styles.notWorkoutIcon}>🤔</div>
                 <Typography
                   variant="geist"
                   weight="medium"
                   size={18}
-                  className={styles.uploadTitle}
+                  className={styles.notWorkoutTitle}
                 >
-                  Upload Your Workout Screenshots
+                  Oops! Wrong Type of Image
                 </Typography>
                 <Typography
                   variant="geist"
                   weight="regular"
                   size={14}
-                  className={styles.uploadDescription}
+                  className={styles.notWorkoutMessage}
                 >
-                  Take screenshots from your running app and our AI will extract
-                  your workout data to share with the community
+                  {nonWorkoutMessage}
                 </Typography>
-                <div className={styles.uploadTips}>
+                <div className={styles.workoutAppExamples}>
                   <Typography
                     variant="geist"
                     weight="medium"
                     size={12}
-                    className={styles.tipsTitle}
+                    className={styles.examplesTitle}
                   >
-                    💡 Tips for best results:
+                    📱 Try screenshots from these apps:
                   </Typography>
-                  <ul className={styles.tipsList}>
-                    <li>Take screenshots of your workout summary</li>
-                    <li>Include distance, time, and pace information</li>
-                    <li>Make sure text is clearly visible</li>
-                    <li>Upload up to 4 screenshots</li>
+                  <div className={styles.appsList}>
+                    <span className={styles.appName}>Nike Run Club</span>
+                    <span className={styles.appName}>Strava</span>
+                    <span className={styles.appName}>Garmin Connect</span>
+                    <span className={styles.appName}>Apple Fitness</span>
+                    <span className={styles.appName}>Adidas Running</span>
+                    <span className={styles.appName}>MapMyRun</span>
+                  </div>
+                </div>
+                <div className={styles.workoutDataExample}>
+                  <Typography
+                    variant="geist"
+                    weight="medium"
+                    size={12}
+                    className={styles.exampleTitle}
+                  >
+                    🎯 We're looking for screenshots that show:
+                  </Typography>
+                  <ul className={styles.dataList}>
+                    <li>Distance (e.g., 5.2 km)</li>
+                    <li>Time (e.g., 28:45)</li>
+                    <li>Pace (e.g., 5:30/km)</li>
+                    <li>Calories burned</li>
+                    <li>Route maps</li>
                   </ul>
                 </div>
               </div>
@@ -595,6 +767,23 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
           />
         )}
 
+        {uploadState === "not_workout_image" && (
+          <div className={styles.actionButtons}>
+            <Button
+              variant="secondary"
+              caption="Cancel"
+              onClick={onClose || (() => {})}
+              className={styles.secondaryButton}
+            />
+            <Button
+              variant="primary"
+              caption="🏃‍♂️ Try Different Screenshots"
+              onClick={handleTryAgain}
+              className={styles.primaryButton}
+            />
+          </div>
+        )}
+
         {uploadState === "selecting" && (
           <div className={styles.actionButtons}>
             <Button
@@ -605,7 +794,7 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
             />
             <Button
               variant="primary"
-              caption={`Process ${selectedFiles.length} Screenshot${
+              caption={`upload ${selectedFiles.length} screenshot${
                 selectedFiles.length > 1 ? "s" : ""
               }`}
               onClick={handleUpload}
@@ -619,7 +808,7 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
           <div className={styles.actionButtons}>
             <Button
               variant="secondary"
-              caption="Edit Data"
+              caption="edit data"
               onClick={() => setUploadState("selecting")}
               className={styles.secondaryButton}
             />

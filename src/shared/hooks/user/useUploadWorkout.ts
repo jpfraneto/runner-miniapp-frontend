@@ -36,6 +36,8 @@ export interface ExtractedWorkoutData {
     pace: string;
   }>;
   extractedText: string[];
+  isWorkoutImage: boolean;
+  errorMessage?: string;
 }
 
 export interface CompletedRun {
@@ -100,29 +102,49 @@ export const useUploadWorkout = () => {
   return useMutation({
     mutationFn: uploadWorkoutScreenshots,
     onSuccess: (data: UploadWorkoutResponse) => {
-      // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["todaysMission"] });
-      queryClient.invalidateQueries({ queryKey: ["userPerformance"] });
-      queryClient.invalidateQueries({ queryKey: ["workoutSessions"] });
-      queryClient.invalidateQueries({ queryKey: ["weeklyProgress"] });
-      queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+      console.log("IN HEREEEE THE DATA IS", JSON.stringify(data, null, 2));
 
-      console.log("IN HEREEEE THE DATA IS", data);
-      // Set the completed run data for immediate access
-      queryClient.setQueryData(
-        ["completedRun", data.data.completedRun.id],
-        data.data.completedRun
-      );
+      // Only invalidate queries and set data if this is actually a successful workout
+      if (
+        data.data.extractedData.isWorkoutImage &&
+        data.data.extractedData.confidence > 0
+      ) {
+        // Invalidate relevant queries to refresh data
+        queryClient.invalidateQueries({ queryKey: ["todaysMission"] });
+        queryClient.invalidateQueries({ queryKey: ["userPerformance"] });
+        queryClient.invalidateQueries({ queryKey: ["workoutSessions"] });
+        queryClient.invalidateQueries({ queryKey: ["weeklyProgress"] });
+        queryClient.invalidateQueries({ queryKey: ["leaderboard"] });
+        queryClient.invalidateQueries({ queryKey: ["workoutHistory"] });
 
-      // Log confidence level
-      if (data.data.extractedData.confidence >= 0.8) {
-        console.log("🎉 High confidence extraction:", data.data.extractedData);
+        // Set the completed run data for immediate access
+        queryClient.setQueryData(
+          ["completedRun", data.data.completedRun.id],
+          data.data.completedRun
+        );
+
+        // Log confidence level
+        if (data.data.extractedData.confidence >= 0.8) {
+          console.log(
+            "🎉 High confidence extraction:",
+            data.data.extractedData
+          );
+        } else {
+          console.log(
+            "⚠️ Low confidence - may need verification:",
+            data.data.extractedData
+          );
+        }
       } else {
         console.log(
-          "⚠️ Low confidence - may need verification:",
+          "❌ Not a workout image or no valid data extracted:",
           data.data.extractedData
         );
       }
+      queryClient.setQueryData(
+        ["completedRun", data.data],
+        data.data.completedRun
+      );
     },
     onError: (error: Error) => {
       console.error("Upload failed:", error.message);

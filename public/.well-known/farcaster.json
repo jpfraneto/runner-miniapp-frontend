@@ -8,7 +8,7 @@
     "version": "1",
     "name": "$RUNNER",
     "iconUrl": "https://github.com/jpfraneto/images/blob/main/screenshoott.png?raw=true",
-    "homeUrl": "https://runnercoin.lat",
+    "homeUrl": "https://miniapp.anky.app",
     "imageUrl": "https://github.com/jpfraneto/images/blob/main/runnerimage.png?raw=true",
     "buttonTitle": "Start Running",
     "splashImageUrl": "https://github.com/jpfraneto/images/blob/main/output.gif?raw=true",
