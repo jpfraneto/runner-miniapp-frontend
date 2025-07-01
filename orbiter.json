@@ -1,0 +1,5 @@
+{
+  "domain": "runnercoin",
+  "buildCommand": "bun run build",
+  "buildDir": "dist"
+}

@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjE2MDk4LCJ0eXBlIjoiY3VzdG9keSIsImtleSI6IjB4YUIyMERlOGY1QTRmOGUxNDdCYWFDOUQxZjZlMjM2ODYxNDg1NTE2QSJ9",
+    "payload": "eyJkb21haW4iOiJicm5kLmxhdCJ9",
+    "signature": "MHhiM2RiMTYxNTQ3NDE5NGQxZmYyMjk1M2RmNGU4ZjEwZjhkZGYwMDRjMWJmZDBlZGYwOTBiNTM4ZWQ1NDQ0NWVkNzNlMjEwODg0ZmMwN2ZmMmE2YmMxNjA5YmNjZDE0YzA4N2ZhMmJlNTljNGY3MjBmZWZhMTA5OGY4OTY3ZTVjMjFi"
+  },
+  "frame": {
+    "version": "1",
+    "name": "$RUNNER",
+    "iconUrl": "https://github.com/jpfraneto/images/blob/main/screenshoott.png?raw=true",
+    "homeUrl": "https://runnercoin.lat",
+    "imageUrl": "https://github.com/jpfraneto/images/blob/main/runnerimage.png?raw=true",
+    "buttonTitle": "Start Running",
+    "splashImageUrl": "https://github.com/jpfraneto/images/blob/main/output.gif?raw=true",
+    "splashBackgroundColor": "#000000",
+    "webhookUrl": "https://poiesis.anky.app/notification-service/webhook"
+  }
+}

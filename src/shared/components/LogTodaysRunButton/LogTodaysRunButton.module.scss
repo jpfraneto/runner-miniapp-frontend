@@ -1,0 +1,17 @@
+.quickActions {
+  width: 90%;
+  margin: 0 auto;
+  padding: 16px 0;
+  padding-bottom: 40px;
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, #000000 60%, transparent);
+}
+
+.logRunButton {
+  min-width: 160px;
+}

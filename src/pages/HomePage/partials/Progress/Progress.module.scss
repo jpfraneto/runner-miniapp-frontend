@@ -1,0 +1,140 @@
+@import "@/styles/index.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+}
+
+.header {
+  text-align: center;
+}
+
+.levelSection {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  text-align: center;
+}
+
+.levelInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.xpBar {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.xpProgress {
+  background: #10b981;
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.3s ease;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.statCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.statIcon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.tokenSection {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tokenHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.claimButton {
+  width: 100%;
+}
+
+.achievementsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.achievement {
+  background: white;
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+
+  &.earned {
+    border-color: #10b981;
+    background: #f0fdf4;
+  }
+
+  &.locked {
+    opacity: 0.6;
+  }
+}
+
+.achievementIcon {
+  font-size: 24px;
+  min-width: 24px;
+}
+
+.achievementInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.earnedBadge {
+  font-size: 16px;
+}
+
+.shareSection {
+  display: flex;
+  justify-content: center;
+}
+
+.shareButton {
+  min-width: 140px;
+}
