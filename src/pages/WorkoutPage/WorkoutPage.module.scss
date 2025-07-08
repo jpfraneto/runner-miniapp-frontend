@@ -1,107 +1,256 @@
 @import "../../shared/styles/index.scss";
 
-.body {
+.container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
-  color: white;
-  overflow: hidden;
-  @include baseLayout();
+  gap: 24px;
+  padding: 20px;
+  padding-bottom: 100px;
 }
 
 .header {
-  padding: 20px;
-  padding-top: 60px;
-  flex-shrink: 0;
-}
-
-.titleSection {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-
-  &:hover {
-    transform: scale(1.02);
-  }
+  gap: 8px;
+  text-align: center;
 }
 
-.mainTitle {
-  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+.title {
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 8px;
-  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .subtitle {
-  color: #888;
+  color: #cccccc;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.sectionTitle {
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.missionSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.missionCard {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.1) 0%,
+    rgba(204, 0, 0, 0.05) 100%
+  );
+  border: 2px solid #ff0000;
+  border-radius: 0;
+  padding: 16px;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 70%
+    );
+    animation: scanline 4s infinite;
+  }
+}
+
+.missionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.missionTitle {
+  color: #ff0000;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.completedBadge {
+  font-size: 16px;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
+}
+
+.missionDescription {
+  color: #cccccc;
+  margin-bottom: 12px;
+  line-height: 1.4;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.missionStats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statLabel {
+  color: #999999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 10px;
+}
+
+.statValue {
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+}
+
+.loadingCard,
+.noMissionCard {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  padding: 16px;
   text-align: center;
-  max-width: 280px;
+  color: #cccccc;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
-.tabs {
-  margin-top: 20px;
-}
-
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 20px;
-  margin-bottom: 20px;
-}
-
-.quickActions {
-  padding: 20px;
-  padding-bottom: 40px;
-  flex-shrink: 0;
+.actionsSection {
   display: flex;
   justify-content: center;
 }
 
-.logWorkoutButton {
+.logButton {
   width: 100%;
   max-width: 300px;
-  height: 56px;
-  border-radius: 16px;
-  font-weight: 600;
-  font-size: 16px;
-  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-  border: none;
-  color: white;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+}
 
-  &:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(255, 107, 53, 0.4);
-  }
+.historySection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-  &:active:not(:disabled) {
-    transform: translateY(0);
-  }
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+.historyItem {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 0 #000000, 0 4px 8px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 0, 0, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 #000000, 0 6px 12px rgba(0, 0, 0, 0.6);
   }
 }
 
-// Responsive design using mixins
-@include isMobile() {
-  .header {
-    padding: 15px;
-    padding-top: 50px;
+.workoutInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workoutDate {
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.workoutDetails {
+  color: #cccccc;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.workoutScore {
+  display: flex;
+  align-items: center;
+}
+
+.score {
+  color: #00ff00;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+}
+
+.emptyHistory {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.emptyText {
+  color: #999999;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+// Animations
+@keyframes scanline {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+    gap: 20px;
   }
 
-  .mainTitle {
-    font-size: 36px;
-    line-height: 32px;
+  .title {
+    font-size: 20px;
+    line-height: 16px;
   }
 
   .subtitle {
@@ -109,50 +258,38 @@
     line-height: 16px;
   }
 
-  .content {
-    padding: 0 15px;
+  .missionCard,
+  .loadingCard,
+  .noMissionCard {
+    padding: 12px;
   }
 
-  .quickActions {
-    padding: 15px;
-    padding-bottom: 30px;
-  }
-
-  .logWorkoutButton {
-    height: 48px;
-    font-size: 14px;
+  .historyItem {
+    padding: 10px;
   }
 }
 
-@include isTablet() {
-  .header {
-    padding: 30px;
-    padding-top: 80px;
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+    gap: 16px;
   }
 
-  .mainTitle {
-    font-size: 52px;
-    line-height: 44px;
+  .title {
+    font-size: 18px;
+    line-height: 14px;
   }
 
   .subtitle {
-    font-size: 16px;
-    line-height: 20px;
-    max-width: 320px;
+    font-size: 11px;
+    line-height: 14px;
   }
 
-  .content {
-    padding: 0 30px;
+  .missionStats {
+    gap: 12px;
   }
 
-  .quickActions {
-    padding: 30px;
-    padding-bottom: 50px;
-  }
-
-  .logWorkoutButton {
-    max-width: 400px;
-    height: 64px;
-    font-size: 18px;
+  .historyItem {
+    padding: 8px;
   }
 }

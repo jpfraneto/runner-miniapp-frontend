@@ -1,6 +1,5 @@
 @import "@/styles/index.scss";
 
-
 .body {
   display: flex;
   flex-direction: column;
@@ -11,32 +10,46 @@
   position: relative;
 
   &.primary {
-    background: linear-gradient(360deg, rgba(45, 34, 58, 0) 0%, #2D223A 64.5%, rgba(45, 34, 58, 0) 100%);
-  
+    background: linear-gradient(
+      360deg,
+      rgba(45, 34, 58, 0) 0%,
+      #2d223a 64.5%,
+      rgba(45, 34, 58, 0) 100%
+    );
+
     .brand {
       background-color: $background-secondary;
-      border: 1px dashed $border-primary;
+      border: 1px dashed white;
 
       svg {
-        color: #FFC3FF;
+        color: #ffc3ff;
       }
     }
   }
-  
+
   &.secondary {
-    background: linear-gradient(360deg, rgba(30, 28, 33, 0) 0%, #1E1C21 64.5%, rgba(30, 28, 33, 0) 100%);
-    
+    background: linear-gradient(
+      360deg,
+      rgba(30, 28, 33, 0) 0%,
+      #1e1c21 64.5%,
+      rgba(30, 28, 33, 0) 100%
+    );
+
     .brand {
       svg {
         color: #fff;
       }
 
-      background-color: #1E1C21;
-      border: 1px dashed #3C3842;
+      background-color: #1e1c21;
+      border: 1px dashed #3c3842;
     }
 
     .number {
-      background-image: linear-gradient(360deg, rgba(30, 28, 33, 0) 0%, #494450 100%);
+      background-image: linear-gradient(
+        360deg,
+        rgba(30, 28, 33, 0) 0%,
+        #494450 100%
+      );
     }
   }
 
@@ -62,7 +75,11 @@
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
-  background-image: linear-gradient(360deg, rgba(45, 34, 58, 0) 0%, #ADA8B3 100%);
+  background-image: linear-gradient(
+    360deg,
+    rgba(45, 34, 58, 0) 0%,
+    #ada8b3 100%
+  );
 }
 
 .field {
@@ -92,7 +109,6 @@
 
   cursor: pointer;
 }
-
 
 .points {
   display: flex;

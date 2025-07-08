@@ -329,3 +329,17 @@ export const shareWorkoutAchievement = async (
       "Content-Type": "application/json",
     },
   });
+
+/**
+ * Fetch all workouts (paginated)
+ * @param page - page number (default 1)
+ * @param limit - items per page (default 50)
+ */
+export const getAllWorkouts = async (page: number = 1, limit: number = 50) => {
+  const result = await request<any>(`${USER_SERVICE}/all-workouts`, {
+    method: "GET",
+    params: { page: String(page), limit: String(limit) },
+  });
+  console.log("/user-service/all-workouts result:", result);
+  return result;
+};

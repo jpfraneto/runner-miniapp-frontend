@@ -1,0 +1,236 @@
+@import "../../shared/styles/index.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
+  color: white;
+  overflow: hidden;
+}
+
+.header {
+  padding: 20px;
+  padding-bottom: 16px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(51, 51, 51, 0.9) 100%
+  );
+  border-bottom: 2px solid #ff0000;
+}
+
+.title {
+  color: #ffffff;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.subtitle {
+  color: #cccccc;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.loadingSection,
+.errorSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 40px 20px;
+}
+
+.loadingText,
+.errorText {
+  color: #cccccc;
+  text-align: center;
+}
+
+.errorText {
+  color: #ff6b6b;
+}
+
+.workoutsSection {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px 20px 20px;
+}
+
+.dateGroup {
+  margin-bottom: 24px;
+}
+
+.dateTitle {
+  color: #ffffff;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.workoutsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.workoutCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 0, 0, 0.3);
+  }
+}
+
+.workoutHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.userAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.username {
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.timeAgo {
+  color: #888888;
+}
+
+.reactions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.reactionCount {
+  font-size: 12px;
+  color: #cccccc;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.workoutText {
+  color: #cccccc;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.workoutStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+.statLabel {
+  color: #888888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .header {
+    padding: 16px;
+    padding-bottom: 12px;
+  }
+
+  .workoutsSection {
+    padding: 0 16px 16px 16px;
+  }
+
+  .workoutCard {
+    padding: 12px;
+  }
+
+  .workoutStats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .userAvatar {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 12px;
+    padding-bottom: 8px;
+  }
+
+  .workoutsSection {
+    padding: 0 12px 12px 12px;
+  }
+
+  .workoutCard {
+    padding: 10px;
+  }
+
+  .workoutStats {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .userAvatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .reactions {
+    gap: 4px;
+  }
+
+  .reactionCount {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}

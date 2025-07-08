@@ -9,26 +9,20 @@
 }
 
 .content {
-  flex: 1;
+  flex: 0.85; // Takes up 85% of the space
   display: flex;
   flex-direction: column;
-  // FIXED: Allow scrolling in content area
   overflow-y: auto;
   overflow-x: hidden;
-  // padding-bottom: 90px;
-
-  // Add smooth scrolling for better UX
   -webkit-overflow-scrolling: touch;
 }
 
 .bar {
-  position: fixed;
+  flex: 0.15; // Takes up 15% of the space
   width: 100%;
   @include baseLayout();
   bottom: 0;
-  z-index: 50;
-  // Add background to prevent content showing through
+  z-index: 500;
   background: var(--background-color, #000);
-  // Add border or shadow for separation
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }

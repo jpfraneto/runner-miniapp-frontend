@@ -1,0 +1,288 @@
+@import "../../shared/styles/index.scss";
+
+.container {
+  padding: 20px;
+  min-height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 100px;
+}
+
+.header {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.title {
+  margin-bottom: 8px;
+  color: white;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.chatContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  padding-bottom: 100px;
+}
+
+.messagesContainer {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 60vh;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.userMessage {
+  justify-content: flex-end;
+}
+
+.coachMessage {
+  justify-content: flex-start;
+}
+
+.messageBubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  position: relative;
+}
+
+.userMessage .messageBubble {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.coachMessage .messageBubble {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  border-bottom-left-radius: 4px;
+}
+
+.messageTime {
+  margin-top: 4px;
+  opacity: 0.7;
+  text-align: right;
+}
+
+.coachMessage .messageTime {
+  text-align: left;
+}
+
+.typingIndicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.typingDot {
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typingDot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typingDot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes typing {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.quickQuestions {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quickQuestionsTitle {
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.quickQuestionsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.quickQuestionButton {
+  font-size: 12px;
+  padding: 8px 12px;
+  height: auto;
+  min-height: 32px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.inputContainer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.textInput {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 20px;
+  padding: 12px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  resize: none;
+  max-height: 100px;
+  min-height: 44px;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+  }
+
+  &::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.sendButton {
+  height: 44px;
+  min-width: 60px;
+  border-radius: 22px;
+  font-size: 14px;
+  font-weight: 600;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px;
+  }
+
+  .messagesContainer {
+    padding: 16px;
+    max-height: 50vh;
+  }
+
+  .messageBubble {
+    max-width: 85%;
+    padding: 10px 14px;
+  }
+
+  .quickQuestionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .inputContainer {
+    padding: 12px 16px;
+  }
+
+  .inputWrapper {
+    gap: 8px;
+  }
+
+  .textInput {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .sendButton {
+    height: 40px;
+    min-width: 50px;
+    font-size: 13px;
+  }
+}
+
+.bottomOptionsBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  background: #111;
+  padding: 16px 12px 24px 12px;
+  display: flex;
+  gap: 12px;
+  z-index: 100;
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.12);
+}
+
+.optionButton {
+  flex: 1 1 0;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  white-space: normal;
+  padding: 12px 8px;
+  height: auto;
+}
+
+.optionButtonPlaceholder {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 48px;
+  border-radius: 12px;
+  background: transparent;
+}
+
+@media (max-width: 600px) {
+  .bottomOptionsBar {
+    padding: 10px 4px 16px 4px;
+    gap: 6px;
+  }
+  .optionButton,
+  .optionButtonPlaceholder {
+    font-size: 13px;
+    padding: 10px 4px;
+    height: 40px;
+  }
+}

@@ -3,21 +3,21 @@ import { createBrowserRouter } from "react-router-dom";
 
 // Pages
 import NotFoundPage from "../pages/NotFoundPage";
-import VotePage from "../pages/VotePage";
 import HomePage from "../pages/HomePage";
 import WelcomePage from "../pages/WelcomePage";
 import ProfilePage from "../pages/ProfilePage";
-import BrandPage from "../pages/BrandPage";
-import ClaimedPage from "../pages/ClaimedPage";
 import RunDetailPage from "../pages/RunDetailPage";
 
 // Providers
 import { AppProvider } from "../shared/providers/AppProvider";
-import PodiumPage from "@/pages/PodiumPage";
-import LeaderboardPage from "@/pages/LeaderboardPage";
+
 import RankingPage from "@/pages/RankingPage";
 import LoginPage from "@/pages/LoginPage";
-import MiniappPage from "@/pages/MiniappPage";
+import MiniAppPage from "@/pages/MiniAppPage";
+import CommunityPage from "@/pages/CommunityPage";
+import ProgressPage from "@/pages/ProgressPage";
+import CoachPage from "@/pages/CoachPage";
+import WorkoutPage from "@/pages/WorkoutPage";
 
 /**
  * Router configuration for Farcaster miniapp.
@@ -33,12 +33,11 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <MiniAppPage />,
+      },
+      {
+        path: "/home",
         element: <HomePage />,
-        children: [
-          { path: "top", element: <HomePage /> },
-          { path: "new", element: <HomePage /> },
-          { path: "all", element: <HomePage /> },
-        ],
       },
       {
         path: "/profile",
@@ -48,19 +47,14 @@ export const router = createBrowserRouter([
           { path: "podium", element: <ProfilePage /> },
         ],
       },
-      {
-        path: "/brand/:id",
-        element: <BrandPage />,
-      },
       { path: "/welcome", element: <WelcomePage /> },
-      { path: "/vote/:unixDate?", element: <VotePage /> },
-      { path: "/podium", element: <PodiumPage /> },
-      { path: "/claimed", element: <ClaimedPage /> },
-      { path: "/leaderboard", element: <LeaderboardPage /> },
       { path: "/ranking", element: <RankingPage /> },
       { path: "/runs/:runId", element: <RunDetailPage /> },
       { path: "/login", element: <LoginPage /> },
-      { path: "/miniapp", element: <MiniappPage /> },
+      { path: "/community", element: <CommunityPage /> },
+      { path: "/progress", element: <ProgressPage /> },
+      { path: "/coach", element: <CoachPage /> },
+      { path: "/workout", element: <WorkoutPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

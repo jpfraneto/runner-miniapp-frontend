@@ -36,17 +36,54 @@ export interface PlannedSession {
 }
 
 export interface CompletedRun {
-  id: number;
-  status: "completed" | "skipped" | "partial";
-  actualDistance?: number;
-  actualTime?: number;
-  actualPace?: string;
-  extractedData?: {
-    confidence?: number;
-    runningApp?: string;
+  isWorkoutImage: boolean;
+  distance: number;
+  duration: number;
+  pace: string;
+  calories: number;
+  elevationGain: number;
+  avgHeartRate: number;
+  maxHeartRate: number | null;
+  steps: number | null;
+  startTime: string;
+  endTime: string | null;
+  route: {
+    name: string;
+    type: string;
   };
-  verified: boolean;
-  shared: boolean;
+  intervals: {
+    detected: boolean;
+    workIntervals: any[];
+    recoveryIntervals: any[];
+    warmup: {
+      distance: number;
+      duration: string;
+      pace: string;
+    };
+    cooldown: {
+      distance: number;
+      duration: string;
+      pace: string;
+    };
+  };
+  paceAnalysis: {
+    chartDetected: boolean;
+    paceVariations: any[];
+    fastestSegmentPace: string | null;
+    pacingStrategy: string;
+  };
+  heartRateAnalysis: {
+    chartDetected: boolean;
+    zones: any[];
+  };
+  splits: any[];
+  weather: {
+    temperature: number;
+    conditions: string;
+  };
+  runningApp: string;
+  confidence: number;
+  extractedText: string[];
 }
 
 export interface TodaysMissionResponse {

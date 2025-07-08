@@ -7,6 +7,7 @@ import Button from "../Button";
 
 // StyleSheet
 import styles from "./AIAgent.module.scss";
+import sdk from "@farcaster/frame-sdk";
 
 interface AIAgentProps {
   message: string;
@@ -67,11 +68,13 @@ const AIAgent: React.FC<AIAgentProps> = ({
 
   const handleButton1Click = () => {
     console.log("yes");
+    sdk.haptics.selectionChanged();
     onButton1Click?.();
   };
 
   const handleButton2Click = () => {
     console.log("no");
+    sdk.haptics.selectionChanged();
     onButton2Click?.();
   };
 

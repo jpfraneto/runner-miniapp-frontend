@@ -1,5 +1,6 @@
 {
-  "domain": "runnercoin",
+  "siteId": "fcb15475-99df-4316-a031-240abb083446",
+  "domain": "runnercoin3",
   "buildCommand": "bun run build",
   "buildDir": "dist"
 }

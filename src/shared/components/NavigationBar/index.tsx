@@ -4,14 +4,7 @@ import classNames from "clsx";
 import { useNavigate, useLocation } from "react-router-dom";
 
 // StyleSheet
-import styles from "./NavigationBar.module.scss";
-
-// Assets
-import HomeIcon from "@/assets/icons/home.svg?react";
-import PodiumIcon from "@/assets/icons/podium-icon.svg?react";
-import CreateIcon from "@/assets/icons/create-icon.svg?react";
-import RankingIcon from "@/assets/icons/ranking-icon.svg?react";
-import LeadersIcon from "@/assets/icons/leaders-icon.svg?react";
+import styles from "./RunnerNavigationBar.module.scss";
 
 // Components
 import Typography from "../Typography";
@@ -32,40 +25,31 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
    */
   const handleClickHome = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/");
+    navigate("/miniapp");
   }, [navigate]);
 
   /**
-   * Handles navigation to podium page
+   * Handles navigation to workout page
    */
-  const handleClickPodium = useCallback(() => {
+  const handleClickWorkout = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/podium");
+    navigate("/miniapp/workout");
   }, [navigate]);
 
   /**
-   * Handles the main create/vote action
+   * Handles navigation to progress page
    */
-  const handleClickCreate = useCallback(() => {
+  const handleClickProgress = useCallback(() => {
     sdk.haptics.selectionChanged();
-    const currentUnixDate = Math.floor(new Date().getTime() / 1000);
-    navigate(data?.hasVotedToday ? `/vote/${currentUnixDate}` : "/vote");
-  }, [data, navigate]);
-
-  /**
-   * Handles navigation to ranking page
-   */
-  const handleClickRanking = useCallback(() => {
-    sdk.haptics.selectionChanged();
-    navigate("/ranking");
+    navigate("/miniapp/progress");
   }, [navigate]);
 
   /**
-   * Handles navigation to leaders page
+   * Handles navigation to community page
    */
-  const handleClickLeaders = useCallback(() => {
+  const handleClickCommunity = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/leaderboard");
+    navigate("/miniapp/community");
   }, [navigate]);
 
   /**
@@ -73,8 +57,9 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
    */
   const isActive = useCallback(
     (path: string) => {
-      if (path === "/" && location.pathname === "/") return true;
-      if (path !== "/" && location.pathname.startsWith(path)) return true;
+      if (path === "/miniapp" && location.pathname === "/miniapp") return true;
+      if (path !== "/miniapp" && location.pathname.startsWith(path))
+        return true;
       return false;
     },
     [location.pathname]
@@ -84,74 +69,61 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
     <div className={classNames(styles.layout)}>
       {/* Home Tab */}
       <button
-        className={classNames(styles.tab, { [styles.active]: isActive("/") })}
+        className={classNames(styles.tab, {
+          [styles.active]: isActive("/miniapp"),
+        })}
         onClick={handleClickHome}
       >
         <div className={styles.iconWrapper}>
-          <HomeIcon className={styles.icon} />
+          <div className={styles.icon}>🏠</div>
         </div>
         <Typography size={10} weight="medium" className={styles.label}>
           Home
         </Typography>
       </button>
 
-      {/* Podium Tab */}
+      {/* Workout Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/podium"),
+          [styles.active]: isActive("/miniapp/workout"),
         })}
-        onClick={handleClickPodium}
+        onClick={handleClickWorkout}
       >
         <div className={styles.iconWrapper}>
-          <PodiumIcon className={styles.icon} />
+          <div className={styles.icon}>🏃‍♂️</div>
         </div>
         <Typography size={10} weight="medium" className={styles.label}>
-          Podiums
+          Workout
         </Typography>
       </button>
 
-      {/* Create Tab (Center with special styling) */}
+      {/* Progress Tab */}
       <button
-        className={classNames(styles.tab, styles.createTab, {
-          [styles.active]: isActive("/vote"),
+        className={classNames(styles.tab, {
+          [styles.active]: isActive("/miniapp/progress"),
         })}
-        onClick={handleClickCreate}
+        onClick={handleClickProgress}
       >
-        <div className={styles.createIconWrapper}>
-          <CreateIcon className={styles.createIcon} />
+        <div className={styles.iconWrapper}>
+          <div className={styles.icon}>📊</div>
         </div>
         <Typography size={10} weight="medium" className={styles.label}>
-          Create
+          Progress
         </Typography>
       </button>
 
-      {/* Ranking Tab */}
+      {/* Community Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/ranking"),
+          [styles.active]: isActive("/miniapp/community"),
         })}
-        onClick={handleClickRanking}
+        onClick={handleClickCommunity}
       >
         <div className={styles.iconWrapper}>
-          <RankingIcon className={styles.icon} />
+          <div className={styles.icon}>👥</div>
         </div>
         <Typography size={10} weight="medium" className={styles.label}>
-          Ranking
-        </Typography>
-      </button>
-
-      {/* Leaders Tab */}
-      <button
-        className={classNames(styles.tab, {
-          [styles.active]: isActive("/leaderboard"),
-        })}
-        onClick={handleClickLeaders}
-      >
-        <div className={styles.iconWrapper}>
-          <LeadersIcon className={styles.icon} />
-        </div>
-        <Typography size={10} weight="medium" className={styles.label}>
-          Leaders
+          Community
         </Typography>
       </button>
     </div>

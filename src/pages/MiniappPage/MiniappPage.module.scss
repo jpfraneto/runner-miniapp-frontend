@@ -1,0 +1,318 @@
+@import "../../shared/styles/index.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
+  color: white;
+  overflow: hidden;
+}
+
+.header {
+  padding: 20px;
+  padding-top: 60px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(51, 51, 51, 0.9) 100%
+  );
+  border-bottom: 3px solid #ff0000;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+.titleSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+}
+
+.mainTitle {
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  text-align: center;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.9);
+}
+
+.subtitle {
+  color: #cccccc;
+  text-align: center;
+  max-width: 280px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.aiWelcome {
+  margin-top: 16px;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px;
+  padding-bottom: 20px;
+}
+
+// Home content styles
+.homeContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 0;
+  min-height: 100%;
+}
+
+.welcomeSection {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.welcomeTitle {
+  color: #ffffff;
+  margin-bottom: 12px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.welcomeText {
+  color: #cccccc;
+  max-width: 320px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 0, 0, 0.3);
+  }
+}
+
+.statIcon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.quickStats {
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: auto;
+}
+
+.goalProgress {
+  margin-top: 12px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.quickActions {
+  padding: 20px;
+  padding-bottom: 40px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(51, 51, 51, 0.8) 100%
+  );
+  border-top: 3px solid #000000;
+  box-shadow: 0 -4px 0 #000000, 0 -8px 16px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+.logWorkoutButton {
+  width: 100%;
+  max-width: 300px;
+  height: 56px;
+  border: 3px solid #ff0000;
+  border-radius: 0;
+  background: linear-gradient(180deg, #ff0000 0%, #cc0000 50%, #990000 100%);
+  color: white;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%
+    );
+    animation: scanline 3s infinite;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #000000, 0 12px 24px rgba(0, 0, 0, 0.8),
+      inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #000000, 0 4px 8px rgba(0, 0, 0, 0.6),
+      inset 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    filter: grayscale(1);
+  }
+}
+
+.buttonText {
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+// Animations
+@keyframes scanline {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .header {
+    padding: 16px;
+    padding-top: 50px;
+  }
+
+  .mainTitle {
+    font-size: 28px;
+    line-height: 24px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .content {
+    padding: 0 16px;
+  }
+
+  .homeContent {
+    padding: 16px 0;
+    gap: 20px;
+  }
+
+  .statsGrid {
+    gap: 12px;
+  }
+
+  .statCard {
+    padding: 16px;
+  }
+
+  .quickActions {
+    padding: 16px;
+    padding-bottom: 30px;
+  }
+
+  .logWorkoutButton {
+    height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 12px;
+    padding-top: 40px;
+  }
+
+  .mainTitle {
+    font-size: 24px;
+    line-height: 20px;
+  }
+
+  .subtitle {
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  .homeContent {
+    padding: 12px 0;
+    gap: 16px;
+  }
+
+  .statsGrid {
+    gap: 8px;
+  }
+
+  .statCard {
+    padding: 12px;
+  }
+
+  .quickActions {
+    padding: 12px;
+    padding-bottom: 20px;
+  }
+
+  .logWorkoutButton {
+    height: 44px;
+  }
+}

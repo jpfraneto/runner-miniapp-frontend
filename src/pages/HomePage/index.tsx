@@ -7,8 +7,6 @@ import styles from "./HomePage.module.scss";
 
 // Components
 import AppLayout from "../../shared/layouts/AppLayout";
-import TabNavigator from "@/components/TabNavigator";
-import Typography from "@/shared/components/Typography";
 
 // Hocs
 import withProtectionRoute from "@/hocs/withProtectionRoute";
@@ -17,11 +15,9 @@ import withProtectionRoute from "@/hocs/withProtectionRoute";
 import WeeklyPlan from "./partials/WeeklyPlan";
 import RunLogs from "./partials/RunLogs";
 import Progress from "./partials/Progress";
-import LogTodaysRunButton from "@/shared/components/LogTodaysRunButton";
 import HomePageRunner from "./partials/HomePageRunner";
 
 function HomePage(): React.ReactNode {
-  const [isInsideMiniapp, setIsInsideMiniapp] = useState(false);
   return (
     <AppLayout>
       <div className={styles.body}>
@@ -34,11 +30,6 @@ function HomePage(): React.ReactNode {
             <Route path="/weekly-plan" element={<WeeklyPlan />} />
           </Routes>
         </div>
-
-        <LogTodaysRunButton
-          isInsideMiniapp={isInsideMiniapp}
-          setIsInsideMiniapp={setIsInsideMiniapp}
-        />
       </div>
     </AppLayout>
   );

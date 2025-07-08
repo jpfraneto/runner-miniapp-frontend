@@ -95,7 +95,9 @@ const WorkoutHistory: React.FC = () => {
                 size={14}
                 className={styles.workoutDate}
               >
-                {new Date(workout.completedDate).toLocaleDateString()}
+                {new Date(
+                  workout.completedDate || workout.startTime
+                ).toLocaleDateString()}
               </Typography>
               <div className={styles.workoutStats}>
                 <Typography

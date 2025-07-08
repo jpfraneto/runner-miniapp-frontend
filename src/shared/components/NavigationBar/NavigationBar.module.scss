@@ -1,15 +1,15 @@
 .layout {
-  padding: 5px;
+  padding: 8px 5px;
   position: relative;
-  background: #0a0e14cc;
-
+  background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  border-top: 1px solid #303540;
-
-  padding-bottom: 8px;
+  border-top: 3px solid #ff0000;
+  box-shadow: 0 -4px 0 #000000, 0 -8px 16px rgba(0, 0, 0, 0.8),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
 }
 
 .tab {
@@ -25,109 +25,154 @@
   transition: all 0.2s ease;
   color: #fff;
   flex: 1;
+  position: relative;
 
   &:hover {
-    opacity: 0.8;
+    transform: translateY(-2px);
+
+    .iconWrapper {
+      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+      box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(255, 0, 0, 0.3);
+    }
   }
 
   &.active {
     .iconWrapper {
-      background: #6366f1;
+      background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+      box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(255, 0, 0, 0.4),
+        inset 0 2px 0 rgba(255, 255, 255, 0.2);
 
       .icon {
-        color: white;
+        transform: scale(1.1);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
       }
     }
 
     .label {
-      color: #6366f1;
+      color: #ff0000;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      font-weight: 600;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 3px;
+      background: #ff0000;
+      border-radius: 0;
+      box-shadow: 0 2px 4px rgba(255, 0, 0, 0.5);
     }
   }
 }
 
 .iconWrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%
+    );
+    animation: scanline 4s infinite;
+  }
 
   .icon {
-    width: 20px;
-    height: 20px;
-    color: rgba(255, 255, 255, 0.8);
-    transition: color 0.2s ease;
-  }
-}
-
-.createTab {
-  position: relative;
-
-  .createIconWrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    border: none;
-
-    .createIcon {
-      width: 20px;
-      height: 20px;
-      color: black;
-    }
-
-    &:hover {
-      transform: translateY(-1px);
-    }
+    font-size: 20px;
+    transition: all 0.3s ease;
+    filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
   }
 }
 
 .label {
   color: rgba(255, 255, 255, 0.8);
-  transition: color 0.2s ease;
+  transition: all 0.3s ease;
   font-size: 11px;
   line-height: 14px;
   text-align: center;
   font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-// Active state for create tab
-.createTab.active {
-  .createIconWrapper {
-    background: white;
-    transform: translateY(-1px);
+// Animations
+@keyframes scanline {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .layout {
+    padding: 6px 4px;
+    padding-bottom: 10px;
+  }
+
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+
+    .icon {
+      font-size: 18px;
+    }
   }
 
   .label {
-    color: white;
+    font-size: 10px;
+    line-height: 12px;
   }
 }
 
-// Keep these existing classes for potential reuse
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 0 8px;
-
-  svg {
-    position: relative;
-    top: 6px;
-    width: 22px;
-    height: 22px;
+@media (max-width: 480px) {
+  .layout {
+    padding: 5px 3px;
+    padding-bottom: 8px;
   }
-}
 
-.points {
-  display: flex;
-  flex-direction: row;
-  gap: 4px;
-  align-items: center;
+  .iconWrapper {
+    width: 36px;
+    height: 36px;
+
+    .icon {
+      font-size: 16px;
+    }
+  }
+
+  .label {
+    font-size: 9px;
+    line-height: 11px;
+  }
 }

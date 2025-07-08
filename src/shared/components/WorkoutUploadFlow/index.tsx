@@ -1,19 +1,18 @@
 // Dependencies
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import sdk from "@farcaster/frame-sdk";
 
 // Components
 import Typography from "../Typography";
 import Button from "../Button";
 import IconButton from "../IconButton";
-import WorkoutHistory from "../WorkoutHistory";
+import { ModalProvider } from "@/shared/providers/ModalProvider";
 
 // Hooks
 import {
   useUploadWorkout,
-  useVerifyWorkout,
+  type CompletedRun,
+  type UploadWorkoutData,
 } from "@/shared/hooks/user/useUploadWorkout";
 
 // Assets
@@ -22,147 +21,89 @@ import CloseIcon from "@/assets/icons/close-icon.svg?react";
 // StyleSheet
 import styles from "./WorkoutUploadFlow.module.scss";
 
-// Types
-import {
-  UploadWorkoutData,
-  ExtractedWorkoutData,
-  CompletedRun,
-} from "@/shared/hooks/user/useUploadWorkout";
-
 interface WorkoutUploadFlowProps {
   onComplete?: (completedRun: CompletedRun) => void;
   onClose?: () => void;
+  plannedSessionId?: string;
 }
 
 type UploadState =
-  | "initial"
+  | "instructions"
   | "selecting"
   | "uploading"
   | "processing"
   | "verification"
   | "error"
-  | "not_workout_image"; // New state for non-workout images
+  | "not_workout_image"
+  | "summary";
 
 const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
   onComplete,
   onClose,
+  plannedSessionId,
 }) => {
-  const navigate = useNavigate();
-  const [uploadState, setUploadState] = useState<UploadState>("initial");
+  const [uploadState, setUploadState] = useState<UploadState>("instructions");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [extractedData, setExtractedData] =
-    useState<ExtractedWorkoutData | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [completedRun, setCompletedRun] = useState<CompletedRun | null>(null);
-  const [error, setError] = useState<string>("");
-  const [nonWorkoutMessage, setNonWorkoutMessage] = useState<string>(""); // New state for fun messages
-  const [uploadInProgress, setUploadInProgress] = useState(false);
-  const [lastUploadHash, setLastUploadHash] = useState<string>("");
-  const [showInstructions, setShowInstructions] = useState(true);
+  const [hideInstructions, setHideInstructions] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Check local storage for user preference
+  const uploadMutation = useUploadWorkout();
+
+  // Check if user has previously chosen to hide instructions
   useEffect(() => {
-    const hideInstructions = localStorage.getItem("hideWorkoutInstructions");
-    if (hideInstructions === "true") {
-      setShowInstructions(false);
+    const shouldHide =
+      localStorage.getItem("hideWorkoutInstructions") === "true";
+    if (shouldHide) {
+      setUploadState("selecting");
     }
   }, []);
 
-  // Hooks
-  const uploadWorkout = useUploadWorkout();
-  const verifyWorkout = useVerifyWorkout();
-
-  // Create a hash of the files being uploaded
-  const createUploadHash = useCallback((files: File[]) => {
-    const fileData = files
-      .map((f) => `${f.name}-${f.size}-${f.lastModified}`)
-      .join("|");
-    return btoa(fileData); // Simple base64 hash
-  }, []);
-
-  // File validation
-  const validateFiles = useCallback(
-    (files: File[], existingFiles: File[] = []): File[] => {
-      const validFiles = files.filter((file) => {
-        const isValidType = file.type.match(/^image\/(jpeg|jpg|png|webp)$/);
-        const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB
-        return isValidType && isValidSize;
-      });
-
-      if (validFiles.length !== files.length) {
-        sdk.haptics.notificationOccurred("error");
-        setError(
-          "Some files were invalid. Only JPEG, PNG, and WebP images under 10MB are allowed."
-        );
-        return [];
-      }
-
-      const totalFiles = existingFiles.length + validFiles.length;
-      if (totalFiles > 4) {
-        sdk.haptics.notificationOccurred("error");
-        setError(
-          `Maximum 4 screenshots allowed. You can add ${
-            4 - existingFiles.length
-          } more.`
-        );
-        return [];
-      }
-
-      return validFiles;
-    },
-    []
-  );
-
-  // File selection handler
-  const handleFileSelect = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(event.target.files || []);
-      const validFiles = validateFiles(files, selectedFiles);
-
-      if (validFiles.length > 0) {
-        // Append new files to existing ones, ensuring we don't exceed 4 files
-        setSelectedFiles((prevFiles) => {
-          const combinedFiles = [...prevFiles, ...validFiles];
-          // Keep only the first 4 files if we exceed the limit
-          return combinedFiles.slice(0, 4);
-        });
-        setUploadState("selecting");
-        setError("");
-        setNonWorkoutMessage(""); // Clear any previous non-workout messages
-        sdk.haptics.selectionChanged();
-      }
-    },
-    [validateFiles, selectedFiles]
-  );
-
-  // Upload handler
-  const handleUpload = useCallback(async () => {
+  // Generate image previews when files are selected
+  useEffect(() => {
     if (selectedFiles.length === 0) {
-      setError("Please select at least one screenshot");
+      setImagePreviews([]);
       return;
     }
+    Promise.all(
+      selectedFiles.map(
+        (file) =>
+          new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.readAsDataURL(file);
+          })
+      )
+    ).then(setImagePreviews);
+  }, [selectedFiles]);
 
-    // Prevent duplicate uploads
-    const uploadHash = createUploadHash(selectedFiles);
-    if (uploadInProgress) {
-      console.log("Upload already in progress, ignoring duplicate request");
-      return;
-    }
+  const handleFileSelect = useCallback(
+    (files: FileList | null) => {
+      if (!files || files.length === 0) return;
+      const fileArray = Array.from(files);
+      if (uploadState === "selecting") {
+        setSelectedFiles((prev) => [...prev, ...fileArray]);
+      } else {
+        setSelectedFiles(fileArray);
+      }
+      setUploadState("selecting");
+    },
+    [uploadState]
+  );
 
-    if (lastUploadHash === uploadHash) {
-      console.log("Same files already uploaded, ignoring duplicate");
-      setError("These files have already been uploaded");
-      return;
-    }
+  const handleUpload = useCallback(async () => {
+    if (selectedFiles.length === 0) return;
 
-    setUploadInProgress(true);
     setUploadState("uploading");
-    setError("");
-    setNonWorkoutMessage("");
-    sdk.haptics.impactOccurred("medium");
+    setError(null);
 
-    // Simulate progress updates
+    // Simulate progress
     const progressInterval = setInterval(() => {
       setUploadProgress((prev) => {
         if (prev >= 90) {
@@ -176,680 +117,494 @@ const WorkoutUploadFlow: React.FC<WorkoutUploadFlowProps> = ({
     try {
       const uploadData: UploadWorkoutData = {
         screenshots: selectedFiles,
-        notes: `Workout uploaded on ${new Date().toLocaleDateString()}`,
+        plannedSessionId,
+        notes: "",
       };
 
-      const result = await uploadWorkout.mutateAsync(uploadData);
-      console.log("************************************************** ");
-      console.log("************************************************** ");
-      console.log("************************************************** ");
-      console.log("************************************************** ");
-      console.log("UPLOAD RESULT ::: ", JSON.stringify(result, null, 2));
-      console.log("************************************************** ");
-      console.log("************************************************** ");
-      console.log("************************************************** ");
-      console.log("************************************************** ");
-
+      const result = await uploadMutation.mutateAsync(uploadData);
       clearInterval(progressInterval);
       setUploadProgress(100);
 
-      // Check if the uploaded images were not workout images
-      if (result.data.extractedData.isWorkoutImage === false) {
-        console.log("Non-workout image detected:", result.data.extractedData);
-        setNonWorkoutMessage(
-          result.data.extractedData.errorMessage ||
-            "🏃‍♂️ That doesn't look like a workout screenshot! Try uploading images from your running app instead."
-        );
-        setUploadState("not_workout_image");
-        sdk.haptics.notificationOccurred("warning");
-        return;
-      }
-
-      // Only proceed if we have valid workout data
-      if (result.data.extractedData.confidence > 0) {
-        // Success - store the hash
-        setLastUploadHash(uploadHash);
-        setExtractedData(result.data.extractedData);
-        setCompletedRun(result.data.completedRun);
-
-        // Success feedback
-        sdk.haptics.notificationOccurred("success");
-
-        // Navigate to run detail page with celebration state
-        navigate(`/runs/${result.data.completedRun.id}`, {
-          state: { fromUpload: true },
-        });
-
-        // Call onComplete callback if provided
-        if (onComplete) {
-          onComplete(result.data.completedRun);
+      // Brief processing state
+      setTimeout(() => {
+        if (
+          result.extractedData.isWorkoutImage &&
+          result.extractedData.confidence > 0
+        ) {
+          setCompletedRun(result.completedRun);
+          setUploadState("summary");
+          onComplete?.(result.completedRun);
+        } else {
+          setUploadState("not_workout_image");
         }
-      } else {
-        // Handle case where confidence is 0 (no valid data extracted)
-        setError(
-          "Failed to extract workout data. Please try with clearer screenshots."
-        );
-        setUploadState("error");
-        sdk.haptics.notificationOccurred("error");
-      }
-    } catch (error) {
+      }, 500);
+    } catch (err) {
       clearInterval(progressInterval);
-      setError(error instanceof Error ? error.message : "Upload failed");
+      setError(err instanceof Error ? err.message : "Upload failed");
       setUploadState("error");
-      sdk.haptics.notificationOccurred("error");
-    } finally {
-      setUploadInProgress(false);
-      setUploadProgress(0);
     }
-  }, [
-    selectedFiles,
-    uploadWorkout,
-    uploadInProgress,
-    lastUploadHash,
-    createUploadHash,
-    navigate,
-    onComplete,
-  ]);
+  }, [selectedFiles, plannedSessionId, uploadMutation, onComplete]);
 
-  // Verification handler
-  const handleVerification = useCallback(async () => {
-    if (!completedRun) return;
-
-    try {
-      const result = await verifyWorkout.mutateAsync(completedRun.id);
-      setCompletedRun(result.data);
-      sdk.haptics.notificationOccurred("success");
-
-      // Navigate to run detail page with celebration state
-      navigate(`/runs/${result.data.id}`, {
-        state: { fromUpload: true },
-      });
-
-      // Call onComplete callback if provided
-      if (onComplete) {
-        onComplete(result.data);
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Verification failed");
-      sdk.haptics.notificationOccurred("error");
-    }
-  }, [completedRun, verifyWorkout, onComplete, navigate]);
-
-  // Reset handler
-  const handleReset = useCallback(() => {
+  const handleClose = useCallback(() => {
+    setUploadState("instructions");
     setSelectedFiles([]);
     setUploadProgress(0);
-    setExtractedData(null);
+    setError(null);
     setCompletedRun(null);
-    setError("");
-    setNonWorkoutMessage("");
-    setUploadState("initial");
-    setUploadInProgress(false);
-    setLastUploadHash("");
+    onClose?.();
+  }, [onClose]);
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleRetry = useCallback(() => {
+    setUploadState("instructions");
+    setError(null);
+  }, []);
+
+  const handleHideInstructions = useCallback(() => {
+    if (hideInstructions) {
+      localStorage.setItem("hideWorkoutInstructions", "true");
     }
+  }, [hideInstructions]);
 
-    sdk.haptics.selectionChanged();
-  }, []);
+  const handleDeleteImage = (index: number) => {
+    setDeleteIndex(index);
+    setShowDeleteModal(true);
+  };
 
-  // Try again with new images handler
-  const handleTryAgain = useCallback(() => {
-    setSelectedFiles([]);
-    setUploadProgress(0);
-    setExtractedData(null);
-    setCompletedRun(null);
-    setError("");
-    setNonWorkoutMessage("");
-    setUploadState("initial");
-    setUploadInProgress(false);
-    // Don't reset lastUploadHash to prevent the same files from being uploaded again
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const confirmDeleteImage = () => {
+    if (deleteIndex !== null) {
+      setSelectedFiles((prev) => prev.filter((_, i) => i !== deleteIndex));
+      setDeleteIndex(null);
+      setShowDeleteModal(false);
     }
-
-    sdk.haptics.selectionChanged();
-  }, []);
-
-  // Trigger file selection
-  const triggerFileSelect = useCallback(() => {
-    sdk.haptics.selectionChanged();
-    fileInputRef.current?.click();
-  }, []);
-
-  // Remove file
-  const removeFile = useCallback((index: number) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-    sdk.haptics.selectionChanged();
-  }, []);
-
-  // Get confidence color
-  const getConfidenceColor = (confidence: number) => {
-    if (confidence >= 0.8) return "#22c55e"; // green
-    if (confidence >= 0.6) return "#eab308"; // yellow
-    return "#ef4444"; // red
   };
 
-  // Get confidence text
-  const getConfidenceText = (confidence: number) => {
-    if (confidence >= 0.8) return "High";
-    if (confidence >= 0.6) return "Medium";
-    return "Low";
+  const cancelDeleteImage = () => {
+    setDeleteIndex(null);
+    setShowDeleteModal(false);
   };
 
-  // Handle "don't show again" preference
-  const handleDontShowAgain = () => {
-    localStorage.setItem("hideWorkoutInstructions", "true");
-    setShowInstructions(false);
-    sdk.haptics.selectionChanged();
-  };
-
-  return (
-    <div className={styles.container}>
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept="image/jpeg,image/jpg,image/png,image/webp"
-        onChange={handleFileSelect}
-        style={{ display: "none" }}
-      />
-
-      {/* Header */}
-      <div className={styles.header}>
-        <Typography
-          variant="gta"
-          weight="wide"
-          size={24}
-          className={styles.title}
-        >
-          Share Your Run
-        </Typography>
-        {onClose && (
-          <IconButton
-            variant="secondary"
-            icon={<CloseIcon />}
-            onClick={onClose}
-            className={styles.closeButton}
-          />
-        )}
-      </div>
-
-      {/* Error Display */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={styles.errorMessage}
-        >
-          <Typography
-            variant="geist"
-            weight="medium"
-            size={14}
-            className={styles.errorText}
-          >
-            {error}
-          </Typography>
-        </motion.div>
-      )}
-
-      {/* Content */}
-      <div className={styles.content}>
-        <AnimatePresence mode="wait">
-          {/* Initial State */}
-          {uploadState === "initial" && (
-            <motion.div
-              key="initial"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className={styles.initialState}
-            >
-              {showInstructions ? (
-                <div className={styles.uploadPrompt}>
-                  <div className={styles.uploadIcon}>📱</div>
-                  <Typography
-                    variant="geist"
-                    weight="medium"
-                    size={18}
-                    className={styles.uploadTitle}
-                  >
-                    Upload Your Run Screenshots
-                  </Typography>
-                  <Typography
-                    variant="geist"
-                    weight="regular"
-                    size={14}
-                    className={styles.uploadDescription}
-                  >
-                    Take screenshots from your running app and our AI will
-                    extract your run data to share with the community
-                  </Typography>
-                  <div className={styles.uploadTips}>
-                    <Typography
-                      variant="geist"
-                      weight="medium"
-                      size={12}
-                      className={styles.tipsTitle}
-                    >
-                      💡 Tips for best results:
-                    </Typography>
-                    <ul className={styles.tipsList}>
-                      <li>Take screenshots of your run summary</li>
-                      <li>Include distance, time, and pace information</li>
-                      <li>Make sure text is clearly visible</li>
-                      <li>Upload up to 4 screenshots</li>
-                    </ul>
-                  </div>
-                  <div className={styles.dontShowAgain}>
-                    <button
-                      onClick={handleDontShowAgain}
-                      className={styles.dontShowAgainButton}
-                    >
-                      <Typography
-                        variant="geist"
-                        weight="regular"
-                        size={12}
-                        className={styles.dontShowAgainText}
-                      >
-                        Don't show this screen again
-                      </Typography>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <WorkoutHistory />
-              )}
-            </motion.div>
-          )}
-
-          {/* Non-Workout Image State */}
-          {uploadState === "not_workout_image" && (
-            <motion.div
-              key="not_workout_image"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className={styles.notWorkoutState}
-            >
-              <div className={styles.notWorkoutPrompt}>
-                <div className={styles.notWorkoutIcon}>🤔</div>
-                <Typography
-                  variant="geist"
-                  weight="medium"
-                  size={18}
-                  className={styles.notWorkoutTitle}
-                >
-                  Oops! Wrong Type of Image
-                </Typography>
-                <Typography
-                  variant="geist"
-                  weight="regular"
-                  size={14}
-                  className={styles.notWorkoutMessage}
-                >
-                  {nonWorkoutMessage}
-                </Typography>
-                <div className={styles.workoutAppExamples}>
-                  <Typography
-                    variant="geist"
-                    weight="medium"
-                    size={12}
-                    className={styles.examplesTitle}
-                  >
-                    📱 Try screenshots from these apps:
-                  </Typography>
-                  <div className={styles.appsList}>
-                    <span className={styles.appName}>Nike Run Club</span>
-                    <span className={styles.appName}>Strava</span>
-                    <span className={styles.appName}>Garmin Connect</span>
-                    <span className={styles.appName}>Apple Fitness</span>
-                    <span className={styles.appName}>Adidas Running</span>
-                    <span className={styles.appName}>MapMyRun</span>
-                  </div>
-                </div>
-                <div className={styles.workoutDataExample}>
-                  <Typography
-                    variant="geist"
-                    weight="medium"
-                    size={12}
-                    className={styles.exampleTitle}
-                  >
-                    🎯 We're looking for screenshots that show:
-                  </Typography>
-                  <ul className={styles.dataList}>
-                    <li>Distance (e.g., 5.2 km)</li>
-                    <li>Time (e.g., 28:45)</li>
-                    <li>Pace (e.g., 5:30/km)</li>
-                    <li>Calories burned</li>
-                    <li>Route maps</li>
-                  </ul>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* File Selection State */}
-          {uploadState === "selecting" && (
-            <motion.div
-              key="selecting"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className={styles.fileSelection}
-            >
+  const getStateContent = () => {
+    switch (uploadState) {
+      case "instructions":
+        return (
+          <div className={styles.instructionsState}>
+            <div className={styles.instructionsHeader}>
+              <div className={styles.instructionIcon}>📱</div>
+              <Typography as="h2" variant="druk" weight="wide" size={24}>
+                Log Your Run
+              </Typography>
               <Typography
                 variant="geist"
-                weight="medium"
                 size={16}
-                className={styles.sectionTitle}
+                className={styles.instructionSubtitle}
               >
-                Selected Screenshots ({selectedFiles.length}/4)
+                Share your running achievements with the community
               </Typography>
+            </div>
 
-              <div className={styles.fileList}>
-                {selectedFiles.map((file, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={styles.fileItem}
+            <div className={styles.instructionSteps}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <div className={styles.stepContent}>
+                  <Typography variant="geist" weight="medium" size={16}>
+                    Open your favorite running app
+                  </Typography>
+                  <Typography
+                    variant="geist"
+                    size={14}
+                    className={styles.stepDescription}
                   >
-                    <div className={styles.filePreview}>
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Preview ${index + 1}`}
-                        className={styles.previewImage}
+                    Strava, Nike Run Club, Garmin, or any app you use
+                  </Typography>
+                </div>
+              </div>
+
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <div className={styles.stepContent}>
+                  <Typography variant="geist" weight="medium" size={16}>
+                    Take a screenshot of your workout
+                  </Typography>
+                  <Typography
+                    variant="geist"
+                    size={14}
+                    className={styles.stepDescription}
+                  >
+                    Make sure distance, time, and pace are visible
+                  </Typography>
+                </div>
+              </div>
+
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <div className={styles.stepContent}>
+                  <Typography variant="geist" weight="medium" size={16}>
+                    Upload and share with the community
+                  </Typography>
+                  <Typography
+                    variant="geist"
+                    size={14}
+                    className={styles.stepDescription}
+                  >
+                    We'll automatically extract your workout data
+                  </Typography>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.instructionActions}>
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                variant="primary"
+                caption="📸 Select Screenshots"
+                className={styles.primaryButton}
+              />
+
+              <div className={styles.checkboxContainer}>
+                <input
+                  type="checkbox"
+                  id="hideInstructions"
+                  checked={hideInstructions}
+                  onChange={(e) => setHideInstructions(e.target.checked)}
+                  className={styles.checkbox}
+                />
+                <label
+                  htmlFor="hideInstructions"
+                  className={styles.checkboxLabel}
+                >
+                  <Typography variant="geist" size={14}>
+                    Don't show this again
+                  </Typography>
+                </label>
+              </div>
+            </div>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                handleFileSelect(e.target.files);
+                if (uploadState !== "selecting") handleHideInstructions();
+              }}
+              style={{ display: "none" }}
+            />
+          </div>
+        );
+
+      case "selecting":
+        return (
+          <div className={styles.selectingState}>
+            <div className={styles.stateHeader}>
+              <div className={styles.stateIcon}>📁</div>
+              <Typography as="h2" variant="druk" weight="wide" size={24}>
+                Ready to Upload
+              </Typography>
+              <Typography variant="geist" size={16}>
+                {selectedFiles.length} screenshot
+                {selectedFiles.length !== 1 ? "s" : ""} selected
+              </Typography>
+            </div>
+
+            <div className={styles.imagePreviewRow}>
+              {imagePreviews.map((src, index) => (
+                <div key={index} className={styles.imagePreviewItem}>
+                  <img
+                    src={src}
+                    alt={`Screenshot ${index + 1}`}
+                    className={styles.imagePreviewImg}
+                  />
+                  <button
+                    className={styles.deleteImageButton}
+                    onClick={() => handleDeleteImage(index)}
+                    aria-label="Delete image"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <div
+                className={styles.addMoreItem}
+                onClick={() => fileInputRef.current?.click()}
+                tabIndex={0}
+                role="button"
+                aria-label="Add more images"
+              >
+                <span className={styles.addMoreIcon}>＋</span>
+              </div>
+            </div>
+
+            <div className={styles.stateActions}>
+              <Button
+                onClick={handleUpload}
+                variant="primary"
+                caption="🚀 Upload Workout"
+                className={styles.primaryButton}
+                disabled={selectedFiles.length === 0}
+              />
+              <Button
+                onClick={handleClose}
+                variant="secondary"
+                caption="Cancel"
+              />
+            </div>
+
+            {showDeleteModal && (
+              <ModalProvider>
+                <div className={styles.confirmModalOverlay}>
+                  <div className={styles.confirmModalBox}>
+                    <Typography as="h3" variant="druk" size={20}>
+                      Delete this image?
+                    </Typography>
+                    <Typography variant="geist" size={16}>
+                      Are you sure you want to remove this screenshot?
+                    </Typography>
+                    <div className={styles.confirmModalActions}>
+                      <Button
+                        onClick={confirmDeleteImage}
+                        variant="primary"
+                        caption="Yes, delete"
+                        className={styles.primaryButton}
+                      />
+                      <Button
+                        onClick={cancelDeleteImage}
+                        variant="secondary"
+                        caption="Cancel"
                       />
                     </div>
-                    <div className={styles.fileInfo}>
-                      <Typography
-                        variant="geist"
-                        weight="medium"
-                        size={12}
-                        className={styles.fileName}
-                      >
-                        {file.name}
-                      </Typography>
-                      <Typography
-                        variant="geist"
-                        weight="regular"
-                        size={10}
-                        className={styles.fileSize}
-                      >
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </Typography>
-                    </div>
-                    <IconButton
-                      variant="secondary"
-                      icon={<CloseIcon />}
-                      onClick={() => removeFile(index)}
-                      className={styles.removeFileButton}
-                    />
-                  </motion.div>
-                ))}
-              </div>
+                  </div>
+                </div>
+              </ModalProvider>
+            )}
+          </div>
+        );
 
-              {selectedFiles.length < 4 && (
-                <Button
-                  variant="secondary"
-                  caption="Add More Screenshots"
-                  onClick={triggerFileSelect}
-                  className={styles.addMoreButton}
-                />
-              )}
-            </motion.div>
-          )}
-
-          {/* Upload Progress State */}
-          {(uploadState === "uploading" || uploadState === "processing") && (
-            <motion.div
-              key="uploading"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className={styles.uploadProgress}
-            >
-              <Typography
-                variant="geist"
-                weight="medium"
-                size={16}
-                className={styles.progressTitle}
-              >
-                {uploadState === "uploading"
-                  ? "Uploading Screenshots..."
-                  : "Processing with AI..."}
+      case "uploading":
+        return (
+          <div className={styles.uploadingState}>
+            <div className={styles.stateHeader}>
+              <div className={styles.stateIcon}>⏳</div>
+              <Typography as="h2" variant="druk" weight="wide" size={24}>
+                Uploading Your Run
               </Typography>
+              <Typography variant="geist" size={16}>
+                Processing your workout data...
+              </Typography>
+            </div>
 
+            <div className={styles.progressContainer}>
               <div className={styles.progressBar}>
-                <div
+                <motion.div
                   className={styles.progressFill}
-                  style={{ width: `${uploadProgress}%` }}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${uploadProgress}%` }}
+                  transition={{ duration: 0.3 }}
                 />
               </div>
-
               <Typography
                 variant="geist"
-                weight="regular"
                 size={14}
                 className={styles.progressText}
               >
                 {uploadProgress}% complete
               </Typography>
+            </div>
 
-              <Typography
-                variant="geist"
-                weight="regular"
-                size={12}
-                className={styles.progressHint}
+            <div className={styles.uploadingSteps}>
+              <div
+                className={`${styles.uploadStep} ${
+                  uploadProgress > 20 ? styles.completed : ""
+                }`}
               >
-                {uploadState === "uploading"
-                  ? "Uploading your screenshots to our servers..."
-                  : "Our AI is extracting workout data from your screenshots..."}
-              </Typography>
-            </motion.div>
-          )}
-
-          {/* Verification State */}
-          {uploadState === "verification" && extractedData && (
-            <motion.div
-              key="verification"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className={styles.verification}
-            >
-              <Typography
-                variant="geist"
-                weight="medium"
-                size={16}
-                className={styles.sectionTitle}
-              >
-                Review Extracted Data
-              </Typography>
-
-              <div className={styles.confidenceIndicator}>
-                <Typography
-                  variant="geist"
-                  weight="medium"
-                  size={12}
-                  className={styles.confidenceLabel}
-                >
-                  AI Confidence:
+                <div className={styles.stepIcon}>📤</div>
+                <Typography variant="geist" size={14}>
+                  Uploading files
                 </Typography>
-                <div
-                  className={styles.confidenceBadge}
-                  style={{
-                    backgroundColor: getConfidenceColor(
-                      extractedData.confidence
-                    ),
-                  }}
-                >
-                  <Typography
-                    variant="geist"
-                    weight="medium"
-                    size={12}
-                    className={styles.confidenceText}
-                  >
-                    {getConfidenceText(extractedData.confidence)} (
-                    {Math.round(extractedData.confidence * 100)}%)
-                  </Typography>
-                </div>
               </div>
-
-              <div className={styles.extractedData}>
-                <div className={styles.dataRow}>
-                  <Typography variant="geist" weight="medium" size={14}>
-                    Distance:
-                  </Typography>
-                  <Typography variant="geist" weight="regular" size={14}>
-                    {extractedData.distance} km
-                  </Typography>
-                </div>
-                <div className={styles.dataRow}>
-                  <Typography variant="geist" weight="medium" size={14}>
-                    Duration:
-                  </Typography>
-                  <Typography variant="geist" weight="regular" size={14}>
-                    {extractedData.duration} minutes
-                  </Typography>
-                </div>
-                <div className={styles.dataRow}>
-                  <Typography variant="geist" weight="medium" size={14}>
-                    Pace:
-                  </Typography>
-                  <Typography variant="geist" weight="regular" size={14}>
-                    {extractedData.pace}
-                  </Typography>
-                </div>
-                <div className={styles.dataRow}>
-                  <Typography variant="geist" weight="medium" size={14}>
-                    Calories:
-                  </Typography>
-                  <Typography variant="geist" weight="regular" size={14}>
-                    {extractedData.calories}
-                  </Typography>
-                </div>
-                <div className={styles.dataRow}>
-                  <Typography variant="geist" weight="medium" size={14}>
-                    Running App:
-                  </Typography>
-                  <Typography variant="geist" weight="regular" size={14}>
-                    {extractedData.runningApp}
-                  </Typography>
-                </div>
+              <div
+                className={`${styles.uploadStep} ${
+                  uploadProgress > 50 ? styles.completed : ""
+                }`}
+              >
+                <div className={styles.stepIcon}>🔍</div>
+                <Typography variant="geist" size={14}>
+                  Analyzing workout data
+                </Typography>
               </div>
+              <div
+                className={`${styles.uploadStep} ${
+                  uploadProgress > 80 ? styles.completed : ""
+                }`}
+              >
+                <div className={styles.stepIcon}>✅</div>
+                <Typography variant="geist" size={14}>
+                  Validating results
+                </Typography>
+              </div>
+            </div>
+          </div>
+        );
 
+      case "error":
+        return (
+          <div className={styles.errorState}>
+            <div className={styles.stateHeader}>
+              <div className={styles.stateIcon}>❌</div>
+              <Typography as="h2" variant="druk" weight="wide" size={24}>
+                Upload Failed
+              </Typography>
               <Typography
                 variant="geist"
-                weight="regular"
-                size={12}
-                className={styles.verificationHint}
+                size={16}
+                className={styles.errorMessage}
               >
-                Please verify that the extracted data is correct before sharing.
+                {error}
               </Typography>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            </div>
 
-      {/* Actions */}
-      <div className={styles.actions}>
-        {uploadState === "initial" && (
-          <Button
-            variant="primary"
-            caption="Select Screenshots"
-            onClick={triggerFileSelect}
-            className={styles.primaryButton}
-          />
-        )}
-
-        {uploadState === "not_workout_image" && (
-          <div className={styles.actionButtons}>
-            <Button
-              variant="secondary"
-              caption="Cancel"
-              onClick={onClose || (() => {})}
-              className={styles.secondaryButton}
-            />
-            <Button
-              variant="primary"
-              caption="🏃‍♂️ Try Different Screenshots"
-              onClick={handleTryAgain}
-              className={styles.primaryButton}
-            />
+            <div className={styles.stateActions}>
+              <Button
+                onClick={handleRetry}
+                variant="primary"
+                caption="🔄 Try Again"
+                className={styles.primaryButton}
+              />
+              <Button
+                onClick={handleClose}
+                variant="secondary"
+                caption="Cancel"
+              />
+            </div>
           </div>
-        )}
+        );
 
-        {uploadState === "selecting" && (
-          <div className={styles.actionButtons}>
-            <Button
-              variant="secondary"
-              caption="Cancel"
-              onClick={handleReset}
-              className={styles.secondaryButton}
-            />
-            <Button
-              variant="primary"
-              caption={`upload ${selectedFiles.length} screenshot${
-                selectedFiles.length > 1 ? "s" : ""
-              }`}
-              onClick={handleUpload}
-              disabled={uploadWorkout.isPending || uploadInProgress}
-              className={styles.primaryButton}
-            />
+      case "not_workout_image":
+        return (
+          <div className={styles.notWorkoutState}>
+            <div className={styles.stateHeader}>
+              <div className={styles.stateIcon}>🤔</div>
+              <Typography as="h2" variant="druk" weight="wide" size={24}>
+                Not a Workout Image
+              </Typography>
+              <Typography variant="geist" size={16}>
+                We couldn't detect workout data in your screenshots
+              </Typography>
+            </div>
+
+            <div className={styles.tipsContainer}>
+              <Typography variant="geist" weight="medium" size={16}>
+                Tips for better results:
+              </Typography>
+              <ul className={styles.tipsList}>
+                <li>Make sure the screenshot shows distance, time, and pace</li>
+                <li>
+                  Try taking a screenshot from your running app's summary screen
+                </li>
+                <li>Ensure the text is clear and readable</li>
+                <li>
+                  Upload screenshots from apps like Strava, Nike Run Club, or
+                  Garmin
+                </li>
+              </ul>
+            </div>
+
+            <div className={styles.stateActions}>
+              <Button
+                onClick={handleRetry}
+                variant="primary"
+                caption="📸 Try Different Screenshots"
+                className={styles.primaryButton}
+              />
+              <Button
+                onClick={handleClose}
+                variant="secondary"
+                caption="Cancel"
+              />
+            </div>
           </div>
-        )}
+        );
 
-        {uploadState === "verification" && (
-          <div className={styles.actionButtons}>
-            <Button
-              variant="secondary"
-              caption="edit data"
-              onClick={() => setUploadState("selecting")}
-              className={styles.secondaryButton}
-            />
-            <Button
-              variant="primary"
-              caption="✅ Confirm & Share"
-              onClick={handleVerification}
-              disabled={verifyWorkout.isPending}
-              className={styles.primaryButton}
-            />
+      case "summary":
+        return (
+          <div className={styles.summaryState}>
+            <div className={styles.stateHeader}>
+              <div className={styles.stateIcon}>🎉</div>
+              <Typography as="h2" variant="druk" weight="wide" size={24}>
+                Run Logged Successfully!
+              </Typography>
+              <Typography variant="geist" size={16}>
+                Your workout has been shared with the community
+              </Typography>
+            </div>
+
+            {completedRun && (
+              <div className={styles.workoutSummary}>
+                <div className={styles.summaryCard}>
+                  <div className={styles.summaryStat}>
+                    <Typography variant="druk" weight="wide" size={32}>
+                      {completedRun.distance}
+                    </Typography>
+                    <Typography variant="geist" size={14}>
+                      kilometers
+                    </Typography>
+                  </div>
+                  <div className={styles.summaryStat}>
+                    <Typography variant="druk" weight="wide" size={32}>
+                      {Math.floor(completedRun.duration)}:
+                      {((completedRun.duration % 1) * 60)
+                        .toFixed(0)
+                        .padStart(2, "0")}
+                    </Typography>
+                    <Typography variant="geist" size={14}>
+                      duration
+                    </Typography>
+                  </div>
+                  <div className={styles.summaryStat}>
+                    <Typography variant="druk" weight="wide" size={32}>
+                      {completedRun.pace}
+                    </Typography>
+                    <Typography variant="geist" size={14}>
+                      pace
+                    </Typography>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className={styles.stateActions}>
+              <Button
+                onClick={handleClose}
+                variant="primary"
+                caption="✅ Done"
+                className={styles.primaryButton}
+              />
+            </div>
           </div>
-        )}
+        );
 
-        {uploadState === "error" && (
-          <div className={styles.actionButtons}>
-            <Button
-              variant="secondary"
-              caption="Try Again"
-              onClick={handleReset}
-              className={styles.secondaryButton}
-            />
-            <Button
-              variant="primary"
-              caption="Close"
-              onClick={onClose || (() => {})}
-              className={styles.primaryButton}
-            />
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className={styles.fullScreenOverlay}
+      >
+        <div className={styles.fullScreenContent}>
+          <div className={styles.header}>
+            <IconButton onClick={handleClose} icon={<CloseIcon />} />
           </div>
-        )}
 
-        {(uploadState === "uploading" || uploadState === "processing") && (
-          <Button
-            variant="primary"
-            caption="Processing..."
-            onClick={() => {}}
-            disabled
-            className={styles.primaryButton}
-          />
-        )}
-      </div>
-    </div>
+          <div className={styles.content}>{getStateContent()}</div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

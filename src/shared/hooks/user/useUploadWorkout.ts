@@ -11,83 +11,103 @@ export interface UploadWorkoutData {
   notes?: string;
 }
 
-export interface ExtractedWorkoutData {
-  distance: number;
-  duration: number;
-  pace: string;
-  calories: number;
-  avgHeartRate: number;
-  maxHeartRate: number;
-  elevationGain: number;
-  steps: number;
-  runningApp: string;
-  confidence: number;
-  weather: {
-    temperature?: number;
-    conditions?: string;
-  };
-  route: {
-    name?: string;
-    type?: string;
-  };
-  splits: Array<{
-    distance: number;
-    time: string;
-    pace: string;
-  }>;
-  extractedText: string[];
-  isWorkoutImage: boolean;
-  errorMessage?: string;
-}
-
 export interface CompletedRun {
-  id: number;
-  userId: number;
-  status: "completed";
-  completedDate: string;
-  actualDistance: number; // km
-  actualTime: number; // minutes
-  actualPace: string; // e.g., "5:30/km"
+  id: string;
+  isWorkoutImage: boolean;
+  distance: number; // in km
+  duration: number; // in minutes
+  pace: string; // "min/km"
   calories: number;
+  elevationGain: number;
   avgHeartRate: number;
-  maxHeartRate: number;
-  elevationGain: number; // meters
-  steps: number;
-  screenshotUrls: string[]; // DigitalOcean Spaces URLs
-  extractedData: {
-    runningApp: string;
-    confidence: number;
-    weather: {
-      temperature?: number;
-      conditions?: string;
-    };
-    route: {
-      name?: string;
-      type?: string;
-    };
-    splits: Array<{
-      distance: number;
-      time: string;
-      pace: string;
-    }>;
-    rawText: string[];
+  maxHeartRate: number | null;
+  steps: number | null;
+  startTime: string; // ISO
+  endTime: string | null;
+  route: {
+    name: string;
+    type: "outdoor" | "treadmill" | "track" | "indoor" | string;
   };
-  verified: boolean;
-  isPersonalBest: boolean;
+  intervals: {
+    detected: boolean;
+    workIntervals: Interval[];
+    recoveryIntervals: Interval[];
+    warmup: Interval;
+    cooldown: Interval;
+  };
+  paceAnalysis: {
+    chartDetected: boolean;
+    paceVariations: PaceVariation[];
+    fastestSegmentPace: string | null;
+    pacingStrategy:
+      | "negative split"
+      | "positive split"
+      | "even"
+      | "intervals"
+      | string;
+  };
+  heartRateAnalysis: {
+    chartDetected: boolean;
+    zones: HeartRateZone[];
+  };
+  splits: Split[];
+  weather: {
+    temperature: number; // Celsius
+    conditions: string; // e.g., "cloudy", "rainy"
+  };
+  runningApp: string;
+  confidence: number; // 0–1
+  extractedText: string[];
+  // Additional properties used in RunDetailPage
+  actualDistance?: number; // in km
+  actualTime?: number; // in minutes
+  actualPace?: string; // "min/km"
+  isPersonalBest?: boolean;
   personalBestType?: string;
+  screenshotUrls?: string[];
+  completedDate?: string; // ISO date string
+  extractedData?: CompletedRun;
+  verified?: boolean;
   notes?: string;
 }
 
-export interface UploadWorkoutResponse {
-  success: boolean;
-  data: {
-    completedRun: CompletedRun;
-    extractedData: ExtractedWorkoutData;
-    screenshotUrls: string[];
-    isPersonalBest: boolean;
-    personalBestType?: string;
+export interface Interval {
+  intervalNumber?: number; // optional for warmup/cooldown
+  type: "Run" | "Work" | "Fast" | "Recovery" | "Rest" | string;
+  distance: number; // km
+  duration: string; // formatted "mm:ss.s"
+  pace: string; // e.g., "5:15/km"
+  estimatedSpeed?: {
+    min: number;
+    max: number;
+    avg: number;
   };
-  message: string;
+}
+
+export interface PaceVariation {
+  timePoint: string; // e.g., "16:19"
+  estimatedPace: string; // "5:00/km"
+  intensity: "high" | "medium" | "low" | "recovery" | string;
+}
+
+export interface HeartRateZone {
+  timeRange: string; // "0:00-16:19"
+  avgBPM: number;
+  intensity: "zone 1" | "zone 2" | "zone 3" | "zone 4" | "zone 5" | string;
+}
+
+export interface Split {
+  distance: number;
+  time: string;
+  pace: string;
+}
+
+export interface UploadWorkoutResponse {
+  completedRun: CompletedRun;
+  extractedData: CompletedRun;
+  screenshotUrls: string[];
+  isPersonalBest: boolean;
+  personalBestType?: string;
 }
 
 export interface VerifyWorkoutResponse {
@@ -106,8 +126,8 @@ export const useUploadWorkout = () => {
 
       // Only invalidate queries and set data if this is actually a successful workout
       if (
-        data.data.extractedData.isWorkoutImage &&
-        data.data.extractedData.confidence > 0
+        data.extractedData.isWorkoutImage &&
+        data.extractedData.confidence > 0
       ) {
         // Invalidate relevant queries to refresh data
         queryClient.invalidateQueries({ queryKey: ["todaysMission"] });
@@ -119,31 +139,30 @@ export const useUploadWorkout = () => {
 
         // Set the completed run data for immediate access
         queryClient.setQueryData(
-          ["completedRun", data.data.completedRun.id],
-          data.data.completedRun
+          ["completedRun", data.completedRun.id],
+          data.completedRun
         );
 
         // Log confidence level
-        if (data.data.extractedData.confidence >= 0.8) {
-          console.log(
-            "🎉 High confidence extraction:",
-            data.data.extractedData
-          );
+        if (data.extractedData.confidence >= 0.8) {
+          console.log("🎉 High confidence extraction:", data.extractedData);
         } else {
           console.log(
             "⚠️ Low confidence - may need verification:",
-            data.data.extractedData
+            data.extractedData
           );
         }
       } else {
         console.log(
           "❌ Not a workout image or no valid data extracted:",
-          data.data.extractedData
+          data.extractedData
         );
       }
+
+      // Set the completed run data for immediate access (moved outside the if block)
       queryClient.setQueryData(
-        ["completedRun", data.data],
-        data.data.completedRun
+        ["completedRun", data.completedRun.id],
+        data.completedRun
       );
     },
     onError: (error: Error) => {

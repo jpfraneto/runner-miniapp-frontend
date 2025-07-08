@@ -70,15 +70,17 @@ const RunDetailPage: React.FC = () => {
 
     sdk.haptics.impactOccurred("medium");
 
-    const shareText = `Just completed a ${run.actualDistance}km run in ${
-      run.actualTime
-    } minutes! 🏃‍♂️ ${
+    const shareText = `Just completed a ${
+      run.actualDistance || run.distance
+    }km run in ${run.actualTime || run.duration} minutes! 🏃‍♂️ ${
       run.isPersonalBest ? `New ${run.personalBestType} PB! 🎉` : ""
     } #RUNNER`;
 
     sdk.actions.composeCast({
       text: shareText,
-      embeds: run.screenshotUrls.slice(0, 2) as [string] | [string, string],
+      embeds: (run.screenshotUrls || []).slice(0, 2) as
+        | [string]
+        | [string, string],
     });
   };
 
@@ -248,7 +250,7 @@ const RunDetailPage: React.FC = () => {
               size={14}
               className={styles.dateText}
             >
-              {formatDate(run.completedDate)}
+              {formatDate(run.completedDate || run.startTime)}
             </Typography>
             {run.isPersonalBest && (
               <div className={styles.pbBadge}>
@@ -290,7 +292,7 @@ const RunDetailPage: React.FC = () => {
                 size={32}
                 className={styles.metricValue}
               >
-                {formatTime(run.actualTime)}
+                {formatTime(run.actualTime || run.duration)}
               </Typography>
               <Typography
                 variant="geist"
@@ -376,7 +378,7 @@ const RunDetailPage: React.FC = () => {
                 Steps
               </Typography>
               <Typography variant="geist" weight="regular" size={14}>
-                {run.steps.toLocaleString()}
+                {run?.steps?.toLocaleString()}
               </Typography>
             </div>
             <div className={styles.statRow}>
@@ -384,7 +386,7 @@ const RunDetailPage: React.FC = () => {
                 Running App
               </Typography>
               <Typography variant="geist" weight="regular" size={14}>
-                {run.extractedData.runningApp}
+                {run.extractedData?.runningApp || run.runningApp}
               </Typography>
             </div>
           </div>
@@ -410,7 +412,7 @@ const RunDetailPage: React.FC = () => {
               className={styles.confidenceBadge}
               style={{
                 backgroundColor: getConfidenceColor(
-                  run.extractedData.confidence
+                  run.extractedData?.confidence || run.confidence
                 ),
               }}
             >
@@ -420,26 +422,33 @@ const RunDetailPage: React.FC = () => {
                 size={12}
                 className={styles.confidenceText}
               >
-                {getConfidenceText(run.extractedData.confidence)} (
-                {Math.round(run.extractedData.confidence * 100)}%)
+                {getConfidenceText(
+                  run.extractedData?.confidence || run.confidence
+                )}{" "}
+                (
+                {Math.round(
+                  (run.extractedData?.confidence || run.confidence) * 100
+                )}
+                %)
               </Typography>
             </div>
           </div>
 
-          {!run.verified && run.extractedData.confidence < 0.8 && (
-            <Typography
-              variant="geist"
-              weight="regular"
-              size={12}
-              className={styles.verificationHint}
-            >
-              ⚠️ Low confidence extraction. Consider verifying the data.
-            </Typography>
-          )}
+          {!run.verified &&
+            (run.extractedData?.confidence || run.confidence) < 0.8 && (
+              <Typography
+                variant="geist"
+                weight="regular"
+                size={12}
+                className={styles.verificationHint}
+              >
+                ⚠️ Low confidence extraction. Consider verifying the data.
+              </Typography>
+            )}
         </motion.div>
 
         {/* Screenshots Gallery */}
-        {run.screenshotUrls.length > 0 && (
+        {(run.screenshotUrls || []).length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -452,11 +461,11 @@ const RunDetailPage: React.FC = () => {
               size={16}
               className={styles.sectionTitle}
             >
-              Workout Screenshots ({run.screenshotUrls.length})
+              Workout Screenshots ({(run.screenshotUrls || []).length})
             </Typography>
 
             <div className={styles.galleryGrid}>
-              {run.screenshotUrls.map((url: string, index: number) => (
+              {(run.screenshotUrls || []).map((url: string, index: number) => (
                 <motion.div
                   key={index}
                   whileHover={{ scale: 1.05 }}
@@ -512,14 +521,15 @@ const RunDetailPage: React.FC = () => {
           iconLeft={<ShareIcon />}
           className={styles.shareButton}
         />
-        {!run.verified && run.extractedData.confidence < 0.8 && (
-          <Button
-            variant="primary"
-            caption="Verify Data"
-            onClick={() => navigate(`/verify/${run.id}`)}
-            className={styles.verifyButton}
-          />
-        )}
+        {!run.verified &&
+          (run.extractedData?.confidence || run.confidence) < 0.8 && (
+            <Button
+              variant="primary"
+              caption="Verify Data"
+              onClick={() => navigate(`/verify/${run.id}`)}
+              className={styles.verifyButton}
+            />
+          )}
       </div>
 
       {/* Image Gallery Modal */}
@@ -546,48 +556,41 @@ const RunDetailPage: React.FC = () => {
                 className={styles.galleryCloseButton}
               />
               <img
-                src={run.screenshotUrls[selectedImageIndex]}
+                src={(run.screenshotUrls || [])[selectedImageIndex]}
                 alt={`Workout screenshot ${selectedImageIndex + 1}`}
                 className={styles.galleryModalImage}
               />
-              <div className={styles.galleryNavigation}>
-                <IconButton
-                  variant="secondary"
-                  icon={<ArrowLeftIcon />}
+              <div className={styles.galleryModalFooter}>
+                <span>
+                  {selectedImageIndex + 1} / {(run.screenshotUrls || []).length}
+                </span>
+                <button
                   onClick={() =>
                     setSelectedImageIndex((prev) =>
-                      prev !== null ? Math.max(0, prev - 1) : null
+                      prev !== null && prev > 0 ? prev - 1 : 0
                     )
                   }
-                  className={`${styles.galleryNavButton} ${
-                    selectedImageIndex === 0 ? styles.disabled : ""
-                  }`}
-                />
-                <Typography
-                  variant="geist"
-                  weight="medium"
-                  size={14}
-                  className={styles.galleryCounter}
+                  disabled={selectedImageIndex === 0}
                 >
-                  {selectedImageIndex + 1} / {run.screenshotUrls.length}
-                </Typography>
-                <IconButton
-                  variant="secondary"
-                  icon={<ArrowLeftIcon />}
+                  Prev
+                </button>
+                <button
                   onClick={() =>
                     setSelectedImageIndex((prev) =>
                       prev !== null
-                        ? Math.min(run.screenshotUrls.length - 1, prev + 1)
-                        : null
+                        ? Math.min(
+                            (run.screenshotUrls || []).length - 1,
+                            prev + 1
+                          )
+                        : 0
                     )
                   }
-                  className={`${styles.galleryNavButton} ${
-                    selectedImageIndex === run.screenshotUrls.length - 1
-                      ? styles.disabled
-                      : ""
-                  }`}
-                  style={{ transform: "rotate(180deg)" }}
-                />
+                  disabled={
+                    selectedImageIndex === (run.screenshotUrls || []).length - 1
+                  }
+                >
+                  Next
+                </button>
               </div>
             </motion.div>
           </motion.div>

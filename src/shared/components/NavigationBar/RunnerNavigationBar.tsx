@@ -10,38 +10,57 @@ import styles from "./RunnerNavigationBar.module.scss";
 import Typography from "../Typography";
 
 // Hooks
-import { useAuth } from "@/hooks/auth";
 import sdk from "@farcaster/frame-sdk";
+import { useTodaysMission } from "@/shared/hooks/user/useTodaysMission";
 
-interface RunnerNavigationBarProps {}
+interface RunnerNavigationBarProps {
+  onLogRun?: () => void;
+}
 
-const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
-  const { data } = useAuth();
+const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = ({
+  onLogRun,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { data: todaysMission, isLoading: missionLoading } = useTodaysMission();
 
   /**
    * Handles navigation to home page
    */
   const handleClickHome = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp");
+    navigate("/");
   }, [navigate]);
 
   /**
-   * Handles navigation to workout page
+   * Handles navigation to coach page
    */
-  const handleClickWorkout = useCallback(() => {
+  const handleClickCoach = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp/workout");
+    navigate("/coach");
   }, [navigate]);
+
+  /**
+   * Handles the log run action
+   */
+  const handleClickLogRun = useCallback(() => {
+    sdk.haptics.selectionChanged();
+    if (todaysMission?.hasCompletedToday) {
+      sdk.haptics.notificationOccurred("warning");
+      // Could show a toast or modal saying they already logged today
+    } else {
+      sdk.haptics.notificationOccurred("success");
+      // Trigger the log run modal
+      onLogRun?.();
+    }
+  }, [todaysMission, onLogRun]);
 
   /**
    * Handles navigation to progress page
    */
   const handleClickProgress = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp/progress");
+    navigate("/progress");
   }, [navigate]);
 
   /**
@@ -49,7 +68,7 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
    */
   const handleClickCommunity = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp/community");
+    navigate("/community");
   }, [navigate]);
 
   /**
@@ -57,9 +76,8 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
    */
   const isActive = useCallback(
     (path: string) => {
-      if (path === "/miniapp" && location.pathname === "/miniapp") return true;
-      if (path !== "/miniapp" && location.pathname.startsWith(path))
-        return true;
+      if (path === "/" && location.pathname === "/") return true;
+      if (path !== "/" && location.pathname.startsWith(path)) return true;
       return false;
     },
     [location.pathname]
@@ -70,7 +88,7 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
       {/* Home Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp"),
+          [styles.active]: isActive("/"),
         })}
         onClick={handleClickHome}
       >
@@ -82,25 +100,51 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
         </Typography>
       </button>
 
-      {/* Workout Tab */}
+      {/* Coach Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp/workout"),
+          [styles.active]: isActive("/coach"),
         })}
-        onClick={handleClickWorkout}
+        onClick={handleClickCoach}
       >
         <div className={styles.iconWrapper}>
-          <div className={styles.icon}>🏃‍♂️</div>
+          <div className={styles.icon}>🤖</div>
         </div>
         <Typography size={10} weight="medium" className={styles.label}>
-          Workout
+          Coach
+        </Typography>
+      </button>
+
+      {/* Log Run Tab (Center with special styling) */}
+      <button
+        className={classNames(styles.tab, styles.logRunTab, {
+          [styles.disabled]: missionLoading || todaysMission?.hasCompletedToday,
+        })}
+        onClick={handleClickLogRun}
+        disabled={missionLoading || todaysMission?.hasCompletedToday}
+      >
+        <div className={styles.logRunIconWrapper}>
+          <div className={styles.logRunIcon}>
+            {missionLoading
+              ? "⏳"
+              : todaysMission?.hasCompletedToday
+              ? "✅"
+              : "🏃‍♀️"}
+          </div>
+        </div>
+        <Typography size={10} weight="medium" className={styles.label}>
+          {missionLoading
+            ? "Loading"
+            : todaysMission?.hasCompletedToday
+            ? "Done"
+            : "Log Run"}
         </Typography>
       </button>
 
       {/* Progress Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp/progress"),
+          [styles.active]: isActive("/progress"),
         })}
         onClick={handleClickProgress}
       >
@@ -115,7 +159,7 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
       {/* Community Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp/community"),
+          [styles.active]: isActive("/community"),
         })}
         onClick={handleClickCommunity}
       >
