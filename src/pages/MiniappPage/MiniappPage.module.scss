@@ -146,6 +146,16 @@
   transition: width 0.3s ease;
 }
 
+.completedStats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.secondaryText {
+  color: #666666 !important;
+}
+
 .quickActions {
   padding: 20px;
   padding-bottom: 40px;

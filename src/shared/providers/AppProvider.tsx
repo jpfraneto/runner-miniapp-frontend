@@ -22,18 +22,33 @@ import {
   markNotificationsEnabled,
 } from "@/shared/utils/notifications";
 
+// Hooks
+import {
+  useTodaysMission,
+  type TodaysMissionData,
+} from "@/shared/hooks/user/useTodaysMission";
+
+// Types
+import { RunningSession } from "@/shared/types/running";
+
 export const AuthContext = createContext<{
   token: string | undefined;
   signIn: () => Promise<void>;
   signOut: () => void;
   miniappContext: Context.FrameContext | null;
   isInitialized: boolean;
+  todaysMission: TodaysMissionData | null;
+  refreshMission: () => void;
+  updateMissionAfterCompletion: (runningSession: RunningSession) => void;
 }>({
   token: undefined,
   signIn: async () => {},
   signOut: () => {},
   miniappContext: null,
   isInitialized: false,
+  todaysMission: null,
+  refreshMission: () => {},
+  updateMissionAfterCompletion: () => {},
 });
 
 const queryClient = new QueryClient();
@@ -58,6 +73,10 @@ export function AppProvider(): JSX.Element {
   const [isInitialized, setIsInitialized] = useState(false);
   const [showAddMiniappPrompt, setShowAddMiniappPrompt] = useState(false);
   const [userFid, setUserFid] = useState<number | null>(null);
+
+  // Mission data management
+  const { todaysMission, refreshMission, updateMissionAfterCompletion } =
+    useTodaysMission();
 
   useEffect(() => {
     async function initMiniapp() {
@@ -188,6 +207,9 @@ export function AppProvider(): JSX.Element {
           signOut,
           miniappContext,
           isInitialized,
+          todaysMission,
+          refreshMission,
+          updateMissionAfterCompletion,
         }}
       >
         <BottomSheetProvider>

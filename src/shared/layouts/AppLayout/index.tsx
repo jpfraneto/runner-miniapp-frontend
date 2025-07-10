@@ -1,7 +1,6 @@
 // src/shared/layouts/AppLayout/index.tsx
 
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
 
 // Components
 // import NavigationBar from "@/components/NavigationBar";
@@ -35,11 +34,35 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   const handleLogRun = () => {
     sdk.haptics.selectionChanged();
-    setShowUploadFlow(true);
+    sdk.actions.composeCast({
+      channelKey: "running",
+    });
+    //setShowUploadFlow(true);
   };
 
   return (
     <div className={styles.layout}>
+      {/* Sponsor Bar */}
+      <div
+        className={styles.sponsorBar}
+        onClick={() => {
+          sdk.actions.swapToken({
+            sellToken: "eip155:8453/native", // ETH
+            buyToken:
+              "eip8453:8453/erc20:0x18b6f6049A0af4Ed2BBe0090319174EeeF89f53a", // $RUNNER
+            sellAmount: "69420000000000000", // 1 ETH (example)
+          });
+        }}
+        style={{ cursor: "pointer" }}
+      >
+        <div className={styles.marqueeWrapper}>
+          <div className={styles.marqueeText}>
+            <span>
+              this miniapp is sponsored by <b>$RUNNER</b>
+            </span>
+          </div>
+        </div>
+      </div>
       <div className={styles.content}>{children}</div>
 
       <div className={styles.bar}>

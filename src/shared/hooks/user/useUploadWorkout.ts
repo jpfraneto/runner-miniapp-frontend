@@ -5,71 +5,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { uploadWorkoutScreenshots, verifyWorkoutData } from "@/services/user";
 
 // Types
+import { RunningSession } from "@/shared/types/running";
+
 export interface UploadWorkoutData {
   screenshots: File[];
   plannedSessionId?: string;
   notes?: string;
 }
 
-export interface CompletedRun {
-  id: string;
-  isWorkoutImage: boolean;
-  distance: number; // in km
-  duration: number; // in minutes
-  pace: string; // "min/km"
-  calories: number;
-  elevationGain: number;
-  avgHeartRate: number;
-  maxHeartRate: number | null;
-  steps: number | null;
-  startTime: string; // ISO
-  endTime: string | null;
-  route: {
-    name: string;
-    type: "outdoor" | "treadmill" | "track" | "indoor" | string;
-  };
-  intervals: {
-    detected: boolean;
-    workIntervals: Interval[];
-    recoveryIntervals: Interval[];
-    warmup: Interval;
-    cooldown: Interval;
-  };
-  paceAnalysis: {
-    chartDetected: boolean;
-    paceVariations: PaceVariation[];
-    fastestSegmentPace: string | null;
-    pacingStrategy:
-      | "negative split"
-      | "positive split"
-      | "even"
-      | "intervals"
-      | string;
-  };
-  heartRateAnalysis: {
-    chartDetected: boolean;
-    zones: HeartRateZone[];
-  };
-  splits: Split[];
-  weather: {
-    temperature: number; // Celsius
-    conditions: string; // e.g., "cloudy", "rainy"
-  };
-  runningApp: string;
-  confidence: number; // 0–1
-  extractedText: string[];
-  // Additional properties used in RunDetailPage
-  actualDistance?: number; // in km
-  actualTime?: number; // in minutes
-  actualPace?: string; // "min/km"
-  isPersonalBest?: boolean;
-  personalBestType?: string;
-  screenshotUrls?: string[];
-  completedDate?: string; // ISO date string
-  extractedData?: CompletedRun;
-  verified?: boolean;
-  notes?: string;
-}
+// Legacy alias for backward compatibility
+export type CompletedRun = RunningSession;
 
 export interface Interval {
   intervalNumber?: number; // optional for warmup/cooldown
@@ -103,8 +48,8 @@ export interface Split {
 }
 
 export interface UploadWorkoutResponse {
-  completedRun: CompletedRun;
-  extractedData: CompletedRun;
+  runningSession: RunningSession;
+  extractedData: RunningSession;
   screenshotUrls: string[];
   isPersonalBest: boolean;
   personalBestType?: string;
@@ -112,7 +57,7 @@ export interface UploadWorkoutResponse {
 
 export interface VerifyWorkoutResponse {
   success: boolean;
-  data: CompletedRun;
+  data: RunningSession;
   message: string;
 }
 
@@ -127,7 +72,7 @@ export const useUploadWorkout = () => {
       // Only invalidate queries and set data if this is actually a successful workout
       if (
         data.extractedData.isWorkoutImage &&
-        data.extractedData.confidence > 0
+        (Number(data.extractedData.confidence) || 0) > 0
       ) {
         // Invalidate relevant queries to refresh data
         queryClient.invalidateQueries({ queryKey: ["todaysMission"] });
@@ -139,12 +84,13 @@ export const useUploadWorkout = () => {
 
         // Set the completed run data for immediate access
         queryClient.setQueryData(
-          ["completedRun", data.completedRun.id],
-          data.completedRun
+          ["runningSession", data.runningSession.id],
+          data.runningSession
         );
 
         // Log confidence level
-        if (data.extractedData.confidence >= 0.8) {
+        const confidence = Number(data.extractedData.confidence) || 0;
+        if (confidence >= 0.8) {
           console.log("🎉 High confidence extraction:", data.extractedData);
         } else {
           console.log(
@@ -161,8 +107,8 @@ export const useUploadWorkout = () => {
 
       // Set the completed run data for immediate access (moved outside the if block)
       queryClient.setQueryData(
-        ["completedRun", data.completedRun.id],
-        data.completedRun
+        ["completedRun", data.runningSession.id],
+        data.runningSession
       );
     },
     onError: (error: Error) => {

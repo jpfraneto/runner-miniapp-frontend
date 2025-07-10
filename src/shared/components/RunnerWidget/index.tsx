@@ -1,44 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
 
 // Components
 import WorkoutUploadFlow from "../WorkoutUploadFlow";
 
-// Hooks
-// import { useTodaysMission } from "@/shared/hooks/user/useTodaysMission";
+// Context
+import { AuthContext } from "@/shared/providers/AppProvider";
 
 // Types
-import { CompletedRun } from "@/shared/hooks/user/useUploadWorkout";
+import { RunningSession } from "@/shared/types/running";
 
 // Styles
 import styles from "./RunnerWidget.module.scss";
 
 export type RunType = "fixed_time" | "fixed_distance" | "intervals";
 export type WidgetStateType = "completed" | "pending" | "tomorrow" | "hidden";
-
-interface TodaysMissionData {
-  hasCompletedToday: boolean;
-  todaysCompletedRun?: CompletedRun;
-  todaysPlannedSession?: {
-    id: string;
-    sessionType: RunType;
-    targetDistance?: number;
-    targetTime?: number;
-    targetPace?: string;
-    instructions: string;
-    intervalStructure?: {
-      warmup: number;
-      intervals: Array<{
-        distance: number;
-        pace: string;
-        rest: number;
-        repetitions: number;
-      }>;
-      cooldown: number;
-    };
-  };
-  isRestDay: boolean;
-}
 
 interface RunnerWidgetProps {
   isInsideMiniapp?: boolean;
@@ -158,10 +134,8 @@ const formatDuration = (minutes: number): string => {
 };
 
 // Get mission description for planned sessions
-const getMissionDescription = (
-  plannedSession: TodaysMissionData["todaysPlannedSession"]
-): string => {
-  if (!plannedSession) return "";
+const getMissionDescription = (plannedSession: any): string => {
+  if (!plannedSession) return "Upload your run to track your progress!";
 
   switch (plannedSession.sessionType) {
     case "fixed_time":
@@ -183,66 +157,25 @@ const getMissionDescription = (
   }
 };
 
-// Fetch today's mission data
-const fetchTodaysMission = async (): Promise<TodaysMissionData> => {
-  try {
-    const response = await fetch("/api/runner-workflow/today");
-    if (!response.ok) {
-      throw new Error("Failed to fetch today's mission");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching today's mission:", error);
-    // Return safe defaults
-    return {
-      hasCompletedToday: false,
-      isRestDay: false,
-    };
-  }
-};
-
 const RunnerWidget: React.FC<RunnerWidgetProps> = ({ setIsInsideMiniapp }) => {
-  const [todaysMission, setTodaysMission] = useState<TodaysMissionData | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState(true);
+  const { todaysMission, updateMissionAfterCompletion } =
+    useContext(AuthContext);
   const [showCoachMessage, setShowCoachMessage] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [showUploadFlow, setShowUploadFlow] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const location = useLocation();
 
-  // Fetch today's mission data on component mount
-  useEffect(() => {
-    const loadTodaysMission = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const missionData = await fetchTodaysMission();
-        setTodaysMission(missionData);
-      } catch (err) {
-        setError("Failed to load today's mission");
-        console.error("Error loading mission:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadTodaysMission();
-  }, []);
-
   // Show coach message with delay
   useEffect(() => {
-    if (!todaysMission || isLoading) return;
+    if (!todaysMission) return;
 
     const timer = setTimeout(() => {
       setShowCoachMessage(true);
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [todaysMission, isLoading]);
+  }, [todaysMission]);
 
   // Get coach message based on current state
   const getCoachMessage = (): string => {
@@ -278,14 +211,9 @@ const RunnerWidget: React.FC<RunnerWidgetProps> = ({ setIsInsideMiniapp }) => {
   };
 
   // Handle upload completion
-  const handleUploadComplete = (completedRun: CompletedRun) => {
+  const handleUploadComplete = (completedRun: RunningSession) => {
     setShowUploadFlow(false);
-    setTodaysMission((prev) => ({
-      ...prev,
-      hasCompletedToday: true,
-      todaysCompletedRun: completedRun,
-      isRestDay: false,
-    }));
+    updateMissionAfterCompletion(completedRun);
   };
 
   // Handle upload close
@@ -313,30 +241,6 @@ const RunnerWidget: React.FC<RunnerWidgetProps> = ({ setIsInsideMiniapp }) => {
     );
   }
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className={styles.widgetContainer}>
-        <div className={styles.loadingWidget}>
-          <div className={styles.loadingSpinner} />
-          <span>Loading your mission...</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className={styles.widgetContainer}>
-        <div className={styles.errorWidget}>
-          <span>⚠️ {error}</span>
-          <button onClick={() => window.location.reload()}>Retry</button>
-        </div>
-      </div>
-    );
-  }
-
   // No mission data
   if (!todaysMission) {
     return null;
@@ -351,9 +255,10 @@ const RunnerWidget: React.FC<RunnerWidgetProps> = ({ setIsInsideMiniapp }) => {
 
   const widgetState = getWidgetState();
   const currentSessionType =
-    todaysMission.todaysPlannedSession?.sessionType || "fixed_distance";
+    todaysMission.plannedSession?.sessionType || "fixed_distance";
   const currentSymbol =
-    SessionSymbols[currentSessionType] || SessionSymbols.tomorrow;
+    SessionSymbols[currentSessionType as keyof typeof SessionSymbols] ||
+    SessionSymbols.tomorrow;
 
   return (
     <>
@@ -392,55 +297,52 @@ const RunnerWidget: React.FC<RunnerWidgetProps> = ({ setIsInsideMiniapp }) => {
           {/* Content based on state */}
           <div className={styles.content}>
             {/* COMPLETED STATE - User already finished today's workout */}
-            {widgetState === "completed" &&
-              todaysMission.todaysCompletedRun && (
-                <div className={styles.stateContent}>
-                  <div className={styles.symbolContainer}>{currentSymbol}</div>
-                  <div className={styles.stateInfo}>
-                    <h3>Session Complete ✅</h3>
-                    <div className={styles.completionStats}>
-                      <span className={styles.stat}>
-                        {todaysMission.todaysCompletedRun.distance}km
-                      </span>
-                      <span className={styles.statSeparator}>•</span>
-                      <span className={styles.stat}>
-                        {formatDuration(
-                          todaysMission.todaysCompletedRun.duration
-                        )}
-                      </span>
-                      <span className={styles.statSeparator}>•</span>
-                      <span className={styles.stat}>
-                        {todaysMission.todaysCompletedRun.pace}
-                      </span>
-                    </div>
-
-                    {/* Additional stats if available */}
-                    {(todaysMission.todaysCompletedRun.calories ||
-                      todaysMission.todaysCompletedRun.avgHeartRate) && (
-                      <div className={styles.additionalStats}>
-                        {todaysMission.todaysCompletedRun.avgHeartRate && (
-                          <span className={styles.heartRate}>
-                            ❤️ {todaysMission.todaysCompletedRun.avgHeartRate}{" "}
-                            bpm
-                          </span>
-                        )}
-                        {todaysMission.todaysCompletedRun.calories && (
-                          <span className={styles.calories}>
-                            🔥 {todaysMission.todaysCompletedRun.calories} cal
-                          </span>
-                        )}
-                      </div>
-                    )}
+            {widgetState === "completed" && todaysMission.runningSession && (
+              <div className={styles.stateContent}>
+                <div className={styles.symbolContainer}>{currentSymbol}</div>
+                <div className={styles.stateInfo}>
+                  <h3>Session Complete ✅</h3>
+                  <div className={styles.completionStats}>
+                    <span className={styles.stat}>
+                      {todaysMission.runningSession.distance}
+                      {todaysMission.runningSession.units}
+                    </span>
+                    <span className={styles.statSeparator}>•</span>
+                    <span className={styles.stat}>
+                      {formatDuration(todaysMission.runningSession.duration)}
+                    </span>
+                    <span className={styles.statSeparator}>•</span>
+                    <span className={styles.stat}>
+                      {todaysMission.runningSession.pace}
+                    </span>
                   </div>
 
-                  <button
-                    onClick={handleSessionAction}
-                    className={`${styles.actionButton} ${styles.completed}`}
-                  >
-                    View Details
-                  </button>
+                  {/* Additional stats if available */}
+                  {(todaysMission.runningSession.calories ||
+                    todaysMission.runningSession.avgHeartRate) && (
+                    <div className={styles.additionalStats}>
+                      {todaysMission.runningSession.avgHeartRate && (
+                        <span className={styles.heartRate}>
+                          ❤️ {todaysMission.runningSession.avgHeartRate} bpm
+                        </span>
+                      )}
+                      {todaysMission.runningSession.calories && (
+                        <span className={styles.calories}>
+                          🔥 {todaysMission.runningSession.calories} cal
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                <button
+                  onClick={handleSessionAction}
+                  className={`${styles.actionButton} ${styles.completed}`}
+                >
+                  View Details
+                </button>
+              </div>
+            )}
 
             {/* PENDING STATE - User needs to upload today's workout */}
             {widgetState === "pending" && (
@@ -448,11 +350,9 @@ const RunnerWidget: React.FC<RunnerWidgetProps> = ({ setIsInsideMiniapp }) => {
                 <div className={styles.symbolContainer}>{currentSymbol}</div>
                 <div className={styles.stateInfo}>
                   <h3>Today's Mission</h3>
-                  {todaysMission.todaysPlannedSession ? (
+                  {todaysMission.plannedSession ? (
                     <p className={styles.targetDescription}>
-                      {getMissionDescription(
-                        todaysMission.todaysPlannedSession
-                      )}
+                      {getMissionDescription(todaysMission.plannedSession)}
                     </p>
                   ) : (
                     <p className={styles.targetDescription}>
@@ -493,7 +393,7 @@ const RunnerWidget: React.FC<RunnerWidgetProps> = ({ setIsInsideMiniapp }) => {
         <WorkoutUploadFlow
           onComplete={handleUploadComplete}
           onClose={handleUploadClose}
-          plannedSessionId={todaysMission?.todaysPlannedSession?.id}
+          plannedSessionId={todaysMission?.plannedSession?.id}
         />
       )}
     </>

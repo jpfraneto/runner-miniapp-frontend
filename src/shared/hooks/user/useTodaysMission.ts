@@ -1,114 +1,177 @@
 // src/shared/hooks/user/useTodaysMission.ts
 
-// Dependencies
-import { useQuery } from "@tanstack/react-query";
-import { getTodaysMission } from "@/services/user";
+import { useState, useEffect } from "react";
+import { RunningSession } from "@/shared/types/running";
 
-// Types
+export type RunType = "fixed_time" | "fixed_distance" | "intervals";
+
+// Legacy alias for backward compatibility
+export type CompletedRun = RunningSession;
+
 export interface PlannedSession {
-  id: number;
-  sessionType:
-    | "intervals"
-    | "fixed_time"
-    | "fixed_length"
-    | "tempo"
-    | "long_run"
-    | "recovery";
-  scheduledDate: string;
+  id: string;
+  sessionType: RunType;
   targetDistance?: number;
   targetTime?: number;
   targetPace?: string;
   instructions: string;
-  motivationalMessage?: string;
-  priority: "easy" | "moderate" | "hard" | "key_workout";
-  isCompleted: boolean;
   intervalStructure?: {
-    warmup?: number;
-    intervals?: Array<{
-      distance?: number;
-      time?: number;
-      pace?: string;
-      rest?: number;
-      repetitions?: number;
+    warmup: number;
+    intervals: Array<{
+      distance: number;
+      pace: string;
+      rest: number;
+      repetitions: number;
     }>;
-    cooldown?: number;
+    cooldown: number;
   };
 }
 
-export interface CompletedRun {
-  isWorkoutImage: boolean;
-  distance: number;
-  duration: number;
-  pace: string;
-  calories: number;
-  elevationGain: number;
-  avgHeartRate: number;
-  maxHeartRate: number | null;
-  steps: number | null;
-  startTime: string;
-  endTime: string | null;
-  route: {
-    name: string;
-    type: string;
-  };
-  intervals: {
-    detected: boolean;
-    workIntervals: any[];
-    recoveryIntervals: any[];
-    warmup: {
-      distance: number;
-      duration: string;
-      pace: string;
-    };
-    cooldown: {
-      distance: number;
-      duration: string;
-      pace: string;
-    };
-  };
-  paceAnalysis: {
-    chartDetected: boolean;
-    paceVariations: any[];
-    fastestSegmentPace: string | null;
-    pacingStrategy: string;
-  };
-  heartRateAnalysis: {
-    chartDetected: boolean;
-    zones: any[];
-  };
-  splits: any[];
-  weather: {
-    temperature: number;
-    conditions: string;
-  };
-  runningApp: string;
-  confidence: number;
-  extractedText: string[];
+export interface StreakData {
+  current: number;
+  needsTodaysRun: boolean;
+  isAtRisk: boolean;
 }
 
-export interface TodaysMissionResponse {
-  plannedSession: PlannedSession | null;
-  completedRun: CompletedRun | null;
+export interface WeeklyProgress {
+  completed: number;
+  planned: number;
+  completionRate: number;
+}
+
+export interface TodaysMissionData {
   hasCompletedToday: boolean;
-  weeklyProgress: {
-    completed: number;
-    planned: number;
-    completionRate: number;
-  };
-  streak: {
-    current: number;
-    needsTodaysRun: boolean;
-    isAtRisk: boolean;
-  };
+  runningSession?: RunningSession;
+  plannedSession?: PlannedSession;
+  isRestDay: boolean;
+  streak: StreakData;
+  weeklyProgress: WeeklyProgress;
 }
+
+export type WidgetStateType = "completed" | "pending" | "tomorrow" | "hidden";
+
+// Fetch today's mission data
+const fetchTodaysMission = async (): Promise<TodaysMissionData> => {
+  try {
+    const response = await fetch("/api/runner-workflow/today");
+    if (!response.ok) {
+      throw new Error("Failed to fetch today's mission");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching today's mission:", error);
+    // Return safe defaults
+    return {
+      hasCompletedToday: false,
+      isRestDay: false,
+      streak: { current: 0, needsTodaysRun: false, isAtRisk: false },
+      weeklyProgress: { completed: 0, planned: 0, completionRate: 0 },
+    };
+  }
+};
 
 export const useTodaysMission = () => {
-  return useQuery({
-    queryKey: ["todaysMission"],
-    queryFn: getTodaysMission,
-    staleTime: 2 * 60 * 1000, // Cache for 2 minutes (mission status can change)
-    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
-    refetchOnWindowFocus: true, // Refetch when user returns to app
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes for streak monitoring
-  });
+  const [todaysMission, setTodaysMission] = useState<TodaysMissionData | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch today's mission data
+  const loadTodaysMission = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const missionData = await fetchTodaysMission();
+      setTodaysMission(missionData);
+    } catch (err) {
+      setError("Failed to load today's mission");
+      console.error("Error loading mission:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Refresh mission data
+  const refreshMission = () => {
+    loadTodaysMission();
+  };
+
+  // Update mission data after completion
+  const updateMissionAfterCompletion = (completedRun: CompletedRun) => {
+    setTodaysMission((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        hasCompletedToday: true,
+        completedRun,
+        isRestDay: false,
+      };
+    });
+  };
+
+  // Get widget state
+  const getWidgetState = (): WidgetStateType => {
+    if (!todaysMission) return "hidden";
+    if (todaysMission.hasCompletedToday) return "completed";
+    if (todaysMission.isRestDay) return "tomorrow";
+    return "pending";
+  };
+
+  // Get mission description for planned sessions
+  const getMissionDescription = (): string => {
+    if (!todaysMission?.plannedSession)
+      return "Upload your run to track your progress!";
+
+    const session = todaysMission.plannedSession;
+    switch (session.sessionType) {
+      case "fixed_time":
+        return `Run for ${session.targetTime} minutes${
+          session.targetPace ? ` at ${session.targetPace}` : ""
+        }`;
+      case "fixed_distance":
+        return `Run ${session.targetDistance}km${
+          session.targetPace ? ` at ${session.targetPace}` : ""
+        }`;
+      case "intervals":
+        if (session.intervalStructure) {
+          const intervals = session.intervalStructure.intervals[0];
+          return `${intervals.repetitions}x ${intervals.distance}m @ ${intervals.pace} (${intervals.rest}s rest)`;
+        }
+        return "Interval training session";
+      default:
+        return session.instructions;
+    }
+  };
+
+  // Helper function to format duration from minutes
+  const formatDuration = (minutes: number): string => {
+    const hours = Math.floor(minutes / 60);
+    const mins = Math.floor(minutes % 60);
+    const secs = Math.floor((minutes % 1) * 60);
+
+    if (hours > 0) {
+      return `${hours}:${mins.toString().padStart(2, "0")}:${secs
+        .toString()
+        .padStart(2, "0")}`;
+    }
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  // Load mission data on mount
+  useEffect(() => {
+    loadTodaysMission();
+  }, []);
+
+  return {
+    todaysMission,
+    isLoading,
+    error,
+    refreshMission,
+    updateMissionAfterCompletion,
+    getWidgetState,
+    getMissionDescription,
+    formatDuration,
+  };
 };

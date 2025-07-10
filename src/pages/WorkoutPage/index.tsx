@@ -18,15 +18,15 @@ import styles from "./WorkoutPage.module.scss";
 import sdk from "@farcaster/frame-sdk";
 
 // Types
-import { CompletedRun } from "@/shared/hooks/user/useUploadWorkout";
+import { RunningSession } from "@/shared/types/running";
 
 const WorkoutPage: React.FC = () => {
   const [showUploadFlow, setShowUploadFlow] = useState(false);
-  const { data: todaysMission, isLoading: missionLoading } = useTodaysMission();
+  const { todaysMission, isLoading: missionLoading } = useTodaysMission();
   const { data: workoutHistory, isLoading: historyLoading } =
     useWorkoutHistory();
 
-  const handleUploadComplete = (_completedRun: CompletedRun) => {
+  const handleUploadComplete = (_runningSession: RunningSession) => {
     setShowUploadFlow(false);
     sdk.haptics.notificationOccurred("success");
   };
@@ -185,11 +185,11 @@ const WorkoutPage: React.FC = () => {
             <div className={styles.loadingCard}>
               <Typography size={14}>Loading history...</Typography>
             </div>
-          ) : workoutHistory?.data && workoutHistory.data.length > 0 ? (
+          ) : workoutHistory?.workouts && workoutHistory.workouts.length > 0 ? (
             <div className={styles.historyList}>
-              {workoutHistory.data
+              {workoutHistory.workouts
                 .slice(0, 5)
-                .map((workout: CompletedRun, index: number) => (
+                .map((workout: RunningSession, index: number) => (
                   <div key={index} className={styles.historyItem}>
                     <div className={styles.workoutInfo}>
                       <Typography
@@ -197,14 +197,17 @@ const WorkoutPage: React.FC = () => {
                         weight="medium"
                         className={styles.workoutDate}
                       >
-                        {formatDate(workout.startTime!)}
+                        {formatDate(
+                          workout.completedDate || new Date().toISOString()
+                        )}
                       </Typography>
                       <Typography size={12} className={styles.workoutDetails}>
-                        {workout.distance}km • {Math.floor(workout.duration)}:
-                        {((workout.duration % 1) * 60)
+                        {Number(workout.distance)}km{" "}
+                        {Math.floor(Number(workout.duration))}:
+                        {((Number(workout.duration) % 1) * 60)
                           .toFixed(0)
                           .padStart(2, "0")}{" "}
-                        • {workout.pace}
+                        {workout.pace}
                       </Typography>
                     </div>
                   </div>

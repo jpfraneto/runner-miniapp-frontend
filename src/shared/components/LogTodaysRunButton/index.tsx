@@ -12,9 +12,10 @@ import styles from "./LogTodaysRunButton.module.scss";
 import { useTodaysMission } from "@/shared/hooks/user/useTodaysMission";
 import {
   useUploadWorkout,
-  type CompletedRun,
   type UploadWorkoutData,
 } from "@/shared/hooks/user/useUploadWorkout";
+
+import { RunningSession } from "@/shared/types/running";
 
 // Assets
 import CloseIcon from "@/shared/assets/icons/close-icon.svg?react";
@@ -43,14 +44,16 @@ const LogTodaysRunButton = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [completedRun, setCompletedRun] = useState<CompletedRun | null>(null);
+  const [runningSession, setRunningSession] = useState<RunningSession | null>(
+    null
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const navigate = useNavigate();
 
   // Hooks
-  const { data: todaysMission, isLoading: missionLoading } = useTodaysMission();
+  const { todaysMission, isLoading: missionLoading } = useTodaysMission();
   const uploadMutation = useUploadWorkout();
 
   // Don't show button if user already completed today's run
@@ -80,9 +83,9 @@ const LogTodaysRunButton = ({
 
       if (
         result.extractedData.isWorkoutImage &&
-        result.extractedData.confidence > 0
+        Number(result.extractedData.confidence) > 0
       ) {
-        setCompletedRun(result.completedRun);
+        setRunningSession(result.runningSession);
         setUploadState("summary");
       } else {
         setUploadState("not_workout_image");
@@ -99,7 +102,7 @@ const LogTodaysRunButton = ({
     setSelectedFiles([]);
     setUploadProgress(0);
     setError(null);
-    setCompletedRun(null);
+    setRunningSession(null);
   }, []);
 
   const handleRetry = useCallback(() => {
@@ -170,7 +173,7 @@ const LogTodaysRunButton = ({
             >
               <div className={styles.header}>
                 <Typography as="h2" variant="geist">
-                  Upload Workout
+                  Upload Running Session
                 </Typography>
                 <IconButton
                   onClick={handleCloseUploadFlow}
@@ -182,8 +185,7 @@ const LogTodaysRunButton = ({
                 {uploadState === "initial" && (
                   <div className={styles.initialState}>
                     <Typography variant="geist">
-                      Upload screenshots from your running app to log your
-                      workout
+                      Upload screenshots from your running app to log your run
                     </Typography>
                     <Button
                       onClick={() => fileInputRef.current?.click()}
@@ -209,7 +211,7 @@ const LogTodaysRunButton = ({
                     <Button
                       onClick={handleUpload}
                       variant="primary"
-                      caption="Upload Workout"
+                      caption="Upload Running Session"
                     />
                     <Button
                       onClick={handleCloseUploadFlow}
@@ -222,7 +224,7 @@ const LogTodaysRunButton = ({
                 {uploadState === "uploading" && (
                   <div className={styles.uploadingState}>
                     <Typography variant="geist">
-                      Uploading workout...
+                      Uploading running session...
                     </Typography>
                     <div className={styles.progressBar}>
                       <div
@@ -269,23 +271,24 @@ const LogTodaysRunButton = ({
                   </div>
                 )}
 
-                {uploadState === "summary" && completedRun && (
+                {uploadState === "summary" && runningSession && (
                   <div className={styles.summaryState}>
                     <Typography as="h3" variant="geist">
                       Workout Uploaded Successfully!
                     </Typography>
                     <div className={styles.workoutSummary}>
                       <Typography variant="geist">
-                        Distance: {completedRun.distance}km
+                        Distance: {runningSession?.distance}km
                       </Typography>
                       <Typography variant="geist">
-                        Duration: {Math.floor(completedRun.duration)}:
-                        {((completedRun.duration % 1) * 60)
+                        Duration:{" "}
+                        {Math.floor(Number(runningSession?.duration) || 0)}:
+                        {(((Number(runningSession?.duration) || 0) % 1) * 60)
                           .toFixed(0)
                           .padStart(2, "0")}
                       </Typography>
                       <Typography variant="geist">
-                        Pace: {completedRun.pace}
+                        Pace: {runningSession?.pace}
                       </Typography>
                     </div>
                     <Button

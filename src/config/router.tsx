@@ -5,7 +5,6 @@ import { createBrowserRouter } from "react-router-dom";
 import NotFoundPage from "../pages/NotFoundPage";
 import HomePage from "../pages/HomePage";
 import WelcomePage from "../pages/WelcomePage";
-import ProfilePage from "../pages/ProfilePage";
 import RunDetailPage from "../pages/RunDetailPage";
 
 // Providers
@@ -18,13 +17,10 @@ import CommunityPage from "@/pages/CommunityPage";
 import ProgressPage from "@/pages/ProgressPage";
 import CoachPage from "@/pages/CoachPage";
 import WorkoutPage from "@/pages/WorkoutPage";
+import LeaderboardPage from "@/pages/LeaderboardPage";
 
-/**
+/*
  * Router configuration for Farcaster miniapp.
- *
- * Note: LoginPage has been removed since authentication is handled
- * automatically through Farcaster's QuickAuth system. Users are
- * implicitly authenticated when accessing the miniapp.
  */
 export const router = createBrowserRouter([
   {
@@ -39,14 +35,6 @@ export const router = createBrowserRouter([
         path: "/home",
         element: <HomePage />,
       },
-      {
-        path: "/profile",
-        element: <ProfilePage />,
-        children: [
-          { path: "", element: <ProfilePage /> },
-          { path: "podium", element: <ProfilePage /> },
-        ],
-      },
       { path: "/welcome", element: <WelcomePage /> },
       { path: "/ranking", element: <RankingPage /> },
       { path: "/runs/:runId", element: <RunDetailPage /> },
@@ -55,6 +43,7 @@ export const router = createBrowserRouter([
       { path: "/progress", element: <ProgressPage /> },
       { path: "/coach", element: <CoachPage /> },
       { path: "/workout", element: <WorkoutPage /> },
+      { path: "/leaderboard", element: <LeaderboardPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

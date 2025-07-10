@@ -10,13 +10,11 @@ import styles from "./RunnerNavigationBar.module.scss";
 import Typography from "../Typography";
 
 // Hooks
-import { useAuth } from "@/hooks/auth";
 import sdk from "@farcaster/frame-sdk";
 
 interface NavigationBarProps {}
 
 const NavigationBar: React.FC<NavigationBarProps> = () => {
-  const { data } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 

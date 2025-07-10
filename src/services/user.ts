@@ -17,7 +17,11 @@ import {
   VerifyWorkoutResponse,
   CompletedRun,
 } from "@/shared/hooks/user/useUploadWorkout";
-import { TodaysMissionResponse } from "@/shared/hooks/user/useTodaysMission";
+import { TodaysMissionData } from "@/shared/hooks/user/useTodaysMission";
+import { RunningSession } from "@/shared/types/running";
+
+// Type for today's mission API response
+export type TodaysMissionResponse = TodaysMissionData;
 // Types for run detail
 export interface RunDetailResponse {
   success: boolean;
@@ -177,17 +181,29 @@ export const getTodaysMission = async (): Promise<TodaysMissionResponse> =>
 /**
  * Gets the user's workout history
  *
+ * @param page - page number (default 1)
+ * @param limit - items per page (default 10)
  * @returns Promise with the user's workout history
  */
-export const getWorkoutHistory = async (): Promise<{
-  success: boolean;
-  data: CompletedRun[];
-  message: string;
+export const getWorkoutHistory = async (
+  page: number = 1,
+  limit: number = 10
+): Promise<{
+  workouts: RunningSession[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }> =>
-  await request<{ success: boolean; data: CompletedRun[]; message: string }>(
+  await request<{ workouts: RunningSession[]; pagination: any }>(
     `${USER_SERVICE}/workouts`,
     {
       method: "GET",
+      params: { page: String(page), limit: String(limit) },
     }
   );
 
@@ -343,3 +359,41 @@ export const getAllWorkouts = async (page: number = 1, limit: number = 50) => {
   console.log("/user-service/all-workouts result:", result);
   return result;
 };
+
+/**
+ * Fetch all user workouts from training service (paginated)
+ * @param page - page number (default 1)
+ * @param limit - items per page (default 30)
+ */
+export const getAllUserWorkouts = async (
+  page: number = 1,
+  limit: number = 30
+) => {
+  const result = await request<any>(`${TRAINING_SERVICE}/workouts`, {
+    method: "GET",
+    params: { page: String(page), limit: String(limit) },
+  });
+  console.log("/training-service/workouts result:", result);
+  return result;
+};
+
+export const updateWorkout = async (
+  data: Partial<RunningSession> & { id: string | number }
+) => {
+  const { id, ...body } = data;
+  return await request<RunningSession>(`${USER_SERVICE}/workouts/${id}`, {
+    method: "PATCH",
+    body,
+    headers: { "Content-Type": "application/json" },
+  });
+};
+
+/**
+ * Fetch a user's profile and stats by fid
+ * @param fid - Farcaster ID of the user
+ * @returns Promise with user profile data
+ */
+export const getUserProfile = async (fid: number) =>
+  await request<any>(`${USER_SERVICE}/user/${fid}`, {
+    method: "GET",
+  });

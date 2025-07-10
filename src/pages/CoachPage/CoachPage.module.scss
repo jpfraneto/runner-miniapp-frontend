@@ -2,26 +2,13 @@
 
 .container {
   padding: 20px;
+  padding-top: 60px;
   min-height: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
   flex-direction: column;
   padding-bottom: 100px;
-}
-
-.header {
-  margin-bottom: 24px;
-  text-align: center;
-}
-
-.title {
-  margin-bottom: 8px;
-  color: white;
-}
-
-.subtitle {
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .chatContainer {
@@ -245,25 +232,43 @@
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 150px; /* above nav bar, adjust if needed */
   width: 100vw;
-  background: #111;
-  padding: 16px 12px 24px 12px;
+  background: #181818;
+
   display: flex;
   gap: 12px;
-  z-index: 100;
-  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.12);
+  z-index: 200;
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.18);
+  border-top: 1.5px solid #333;
+  margin-top: 18px;
 }
 
 .optionButton {
   flex: 1 1 0;
   min-width: 0;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 16px;
   white-space: normal;
-  padding: 12px 8px;
+  padding: 16px 8px;
   height: auto;
+  background: linear-gradient(90deg, #ff2d55 0%, #ff1744 100%);
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(255, 45, 85, 0.1);
+  transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+  outline: none;
+  cursor: pointer;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.optionButton:hover,
+.optionButton:focus {
+  background: linear-gradient(90deg, #ff1744 0%, #ff2d55 100%);
+  box-shadow: 0 4px 18px 0 rgba(255, 45, 85, 0.22);
+  transform: translateY(-2px) scale(1.03);
+  color: #fff;
 }
 
 .optionButtonPlaceholder {
@@ -278,11 +283,12 @@
   .bottomOptionsBar {
     padding: 10px 4px 16px 4px;
     gap: 6px;
+    bottom: 56px;
   }
   .optionButton,
   .optionButtonPlaceholder {
-    font-size: 13px;
-    padding: 10px 4px;
+    font-size: 0.98rem;
+    padding: 12px 4px;
     height: 40px;
   }
 }

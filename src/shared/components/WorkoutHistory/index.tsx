@@ -45,7 +45,7 @@ const WorkoutHistory: React.FC = () => {
     );
   }
 
-  const workouts = workoutHistory?.data || [];
+  const workouts = workoutHistory?.workouts || [];
 
   if (workouts.length === 0) {
     return (
@@ -96,7 +96,7 @@ const WorkoutHistory: React.FC = () => {
                 className={styles.workoutDate}
               >
                 {new Date(
-                  workout.completedDate || workout.startTime
+                  workout.completedDate || new Date().toISOString()
                 ).toLocaleDateString()}
               </Typography>
               <div className={styles.workoutStats}>
@@ -106,7 +106,7 @@ const WorkoutHistory: React.FC = () => {
                   size={12}
                   className={styles.stat}
                 >
-                  {workout.actualDistance} km
+                  {Number(workout.distance)} {workout.units}
                 </Typography>
                 <Typography
                   variant="geist"
@@ -114,7 +114,7 @@ const WorkoutHistory: React.FC = () => {
                   size={12}
                   className={styles.stat}
                 >
-                  {workout.actualTime} min
+                  {Number(workout.duration)} min
                 </Typography>
                 <Typography
                   variant="geist"
@@ -122,7 +122,7 @@ const WorkoutHistory: React.FC = () => {
                   size={12}
                   className={styles.stat}
                 >
-                  {workout.actualPace}
+                  {workout.pace}
                 </Typography>
               </div>
             </div>

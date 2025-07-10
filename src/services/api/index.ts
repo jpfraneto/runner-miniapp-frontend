@@ -90,7 +90,7 @@ export async function request<T>(
       throw new Error(`Error: ${response.statusText}`);
     }
 
-    console.log("Request successful, parsing response...");
+    console.log("Request successful, parsing response...", response);
     const data: T = await response.json();
     console.log("Response data in here:", data);
     return data;

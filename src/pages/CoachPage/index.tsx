@@ -30,12 +30,12 @@ const CoachPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Example options (could be dynamic per message)
-  const [options, setOptions] = useState<string[]>([
+  const options = [
     "How do I stay motivated?",
     "How can I improve my pace?",
     "What's a good running schedule?",
     "How do I prevent injuries?",
-  ]);
+  ];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -139,26 +139,6 @@ const CoachPage: React.FC = () => {
     <AppLayout>
       <div className={styles.container}>
         {/* Header */}
-        <div className={styles.header}>
-          <Typography
-            variant="gta"
-            weight="wide"
-            size={24}
-            lineHeight={20}
-            className={styles.title}
-          >
-            AI COACH
-          </Typography>
-          <Typography
-            variant="geist"
-            weight="regular"
-            size={14}
-            lineHeight={18}
-            className={styles.subtitle}
-          >
-            Your personal running mentor
-          </Typography>
-        </div>
 
         {/* Chat Container */}
         <div className={styles.chatContainer}>
@@ -203,23 +183,6 @@ const CoachPage: React.FC = () => {
             )}
             <div ref={messagesEndRef} />
           </div>
-        </div>
-
-        {/* Bottom Options Bar */}
-        <div className={styles.bottomOptionsBar}>
-          {[0, 1, 2, 3].map((i) =>
-            options[i] ? (
-              <Button
-                key={i}
-                variant="primary"
-                caption={options[i]}
-                onClick={() => handleOptionClick(options[i])}
-                className={styles.optionButton}
-              />
-            ) : (
-              <div key={i} className={styles.optionButtonPlaceholder} />
-            )
-          )}
         </div>
       </div>
     </AppLayout>

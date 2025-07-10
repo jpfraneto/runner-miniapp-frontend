@@ -6,6 +6,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 0 4px 0 4px;
 }
 
 .content {
@@ -25,4 +26,63 @@
   z-index: 500;
   background: var(--background-color, #000);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sponsorBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 20px;
+  padding: 0 4px;
+  background: linear-gradient(90deg, #181818 0%, #23272f 100%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 2px solid #ff3c00;
+  box-shadow: 0 2px 16px 0 rgba(255, 60, 0, 0.08), 0 0 8px #ff3c0044;
+  transition: background 0.2s;
+}
+
+.sponsorBar:hover {
+  background: linear-gradient(90deg, #23272f 0%, #181818 100%);
+  box-shadow: 0 4px 24px 0 rgba(255, 60, 0, 0.18), 0 0 16px #ff3c0088;
+}
+
+.marqueeWrapper {
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+
+.marqueeText {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 8px #ff3c0044, 0 0 2px #fff8;
+  user-select: none;
+}
+
+.marqueeText span {
+  display: inline-block;
+  margin: 0 auto;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }

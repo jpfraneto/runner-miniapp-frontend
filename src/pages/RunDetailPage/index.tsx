@@ -70,9 +70,9 @@ const RunDetailPage: React.FC = () => {
 
     sdk.haptics.impactOccurred("medium");
 
-    const shareText = `Just completed a ${
-      run.actualDistance || run.distance
-    }km run in ${run.actualTime || run.duration} minutes! 🏃‍♂️ ${
+    const shareText = `Just completed a ${run.distance}${run.units} run in ${
+      run.duration
+    } minutes! 🏃‍♂️ ${
       run.isPersonalBest ? `New ${run.personalBestType} PB! 🎉` : ""
     } #RUNNER`;
 
@@ -250,7 +250,7 @@ const RunDetailPage: React.FC = () => {
               size={14}
               className={styles.dateText}
             >
-              {formatDate(run.completedDate || run.startTime)}
+              {formatDate(run.completedDate || new Date().toISOString())}
             </Typography>
             {run.isPersonalBest && (
               <div className={styles.pbBadge}>
@@ -274,7 +274,7 @@ const RunDetailPage: React.FC = () => {
                 size={32}
                 className={styles.metricValue}
               >
-                {run.actualDistance}
+                {run.distance}
               </Typography>
               <Typography
                 variant="geist"
@@ -292,7 +292,7 @@ const RunDetailPage: React.FC = () => {
                 size={32}
                 className={styles.metricValue}
               >
-                {formatTime(run.actualTime || run.duration)}
+                {formatTime(run.duration)}
               </Typography>
               <Typography
                 variant="geist"
@@ -310,7 +310,7 @@ const RunDetailPage: React.FC = () => {
                 size={32}
                 className={styles.metricValue}
               >
-                {run.actualPace}
+                {run.pace}
               </Typography>
               <Typography
                 variant="geist"
@@ -365,30 +365,6 @@ const RunDetailPage: React.FC = () => {
                 {run.maxHeartRate} bpm
               </Typography>
             </div>
-            <div className={styles.statRow}>
-              <Typography variant="geist" weight="medium" size={14}>
-                Elevation Gain
-              </Typography>
-              <Typography variant="geist" weight="regular" size={14}>
-                {run.elevationGain}m
-              </Typography>
-            </div>
-            <div className={styles.statRow}>
-              <Typography variant="geist" weight="medium" size={14}>
-                Steps
-              </Typography>
-              <Typography variant="geist" weight="regular" size={14}>
-                {run?.steps?.toLocaleString()}
-              </Typography>
-            </div>
-            <div className={styles.statRow}>
-              <Typography variant="geist" weight="medium" size={14}>
-                Running App
-              </Typography>
-              <Typography variant="geist" weight="regular" size={14}>
-                {run.extractedData?.runningApp || run.runningApp}
-              </Typography>
-            </div>
           </div>
         </motion.div>
 
@@ -411,9 +387,7 @@ const RunDetailPage: React.FC = () => {
             <div
               className={styles.confidenceBadge}
               style={{
-                backgroundColor: getConfidenceColor(
-                  run.extractedData?.confidence || run.confidence
-                ),
+                backgroundColor: getConfidenceColor(Number(run.confidence)),
               }}
             >
               <Typography
@@ -422,29 +396,22 @@ const RunDetailPage: React.FC = () => {
                 size={12}
                 className={styles.confidenceText}
               >
-                {getConfidenceText(
-                  run.extractedData?.confidence || run.confidence
-                )}{" "}
-                (
-                {Math.round(
-                  (run.extractedData?.confidence || run.confidence) * 100
-                )}
-                %)
+                {getConfidenceText(Number(run.confidence))} (
+                {Math.round(Number(run.confidence) * 100)}%)
               </Typography>
             </div>
           </div>
 
-          {!run.verified &&
-            (run.extractedData?.confidence || run.confidence) < 0.8 && (
-              <Typography
-                variant="geist"
-                weight="regular"
-                size={12}
-                className={styles.verificationHint}
-              >
-                ⚠️ Low confidence extraction. Consider verifying the data.
-              </Typography>
-            )}
+          {!run.isWorkoutImage && Number(run.confidence) < 0.8 && (
+            <Typography
+              variant="geist"
+              weight="regular"
+              size={12}
+              className={styles.verificationHint}
+            >
+              ⚠️ Low confidence extraction. Consider verifying the data.
+            </Typography>
+          )}
         </motion.div>
 
         {/* Screenshots Gallery */}
@@ -483,33 +450,6 @@ const RunDetailPage: React.FC = () => {
             </div>
           </motion.div>
         )}
-
-        {/* Notes */}
-        {run.notes && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className={styles.notesCard}
-          >
-            <Typography
-              variant="geist"
-              weight="medium"
-              size={16}
-              className={styles.sectionTitle}
-            >
-              Notes
-            </Typography>
-            <Typography
-              variant="geist"
-              weight="regular"
-              size={14}
-              className={styles.notesText}
-            >
-              {run.notes}
-            </Typography>
-          </motion.div>
-        )}
       </div>
 
       {/* Actions */}
@@ -521,15 +461,14 @@ const RunDetailPage: React.FC = () => {
           iconLeft={<ShareIcon />}
           className={styles.shareButton}
         />
-        {!run.verified &&
-          (run.extractedData?.confidence || run.confidence) < 0.8 && (
-            <Button
-              variant="primary"
-              caption="Verify Data"
-              onClick={() => navigate(`/verify/${run.id}`)}
-              className={styles.verifyButton}
-            />
-          )}
+        {!run.isWorkoutImage && Number(run.confidence) < 0.8 && (
+          <Button
+            variant="primary"
+            caption="Verify Data"
+            onClick={() => navigate(`/verify/${run.id}`)}
+            className={styles.verifyButton}
+          />
+        )}
       </div>
 
       {/* Image Gallery Modal */}
