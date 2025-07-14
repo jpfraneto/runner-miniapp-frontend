@@ -1,0 +1,276 @@
+@import "../../../../shared/styles/index.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+.welcomeCard,
+.previewCard,
+.insightsCard,
+.ctaCard {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.1) 0%,
+    rgba(204, 0, 0, 0.05) 100%
+  );
+  border: 2px solid #ff0000;
+  border-radius: 0;
+  padding: 20px;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 70%
+    );
+    animation: scanline 4s infinite;
+  }
+}
+
+// Welcome Card
+.welcomeCard {
+  text-align: center;
+  padding: 32px 20px;
+}
+
+.welcomeIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.welcomeTitle {
+  color: #ff0000;
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0 0 16px 0;
+}
+
+.welcomeText {
+  color: #cccccc;
+  font-size: 16px;
+  line-height: 1.5;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+// Card Headers
+.cardHeader {
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  color: #ff0000;
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+// Preview Stats
+.previewStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.previewStat {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.statValue {
+  color: #00ff00;
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  color: #cccccc;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Features List
+.featuresList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 16px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+  }
+}
+
+.featureIcon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.featureText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.featureTitle {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.featureDesc {
+  color: #cccccc;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+// CTA Card
+.ctaCard {
+  text-align: center;
+  padding: 32px 20px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 0, 0.1) 0%,
+    rgba(0, 204, 0, 0.05) 100%
+  );
+  border-color: #00ff00;
+}
+
+.ctaContent {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.ctaTitle {
+  color: #00ff00;
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  margin: 0 0 12px 0;
+}
+
+.ctaText {
+  color: #cccccc;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 24px 0;
+}
+
+.ctaButton {
+  background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+  color: #000000;
+  border: none;
+  border-radius: 4px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0 #009900, 0 8px 16px rgba(0, 255, 0, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #33ff33 0%, #00ff00 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 #009900, 0 12px 20px rgba(0, 255, 0, 0.4);
+  }
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #009900, 0 4px 8px rgba(0, 255, 0, 0.3);
+  }
+}
+
+// Animations
+@keyframes scanline {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Responsive Design
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+    gap: 12px;
+  }
+
+  .welcomeCard,
+  .ctaCard {
+    padding: 24px 16px;
+  }
+
+  .welcomeIcon {
+    font-size: 48px;
+  }
+
+  .welcomeTitle {
+    font-size: 24px;
+  }
+
+  .previewStats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .feature {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .featureIcon {
+    font-size: 28px;
+  }
+
+  .ctaButton {
+    padding: 14px 24px;
+    font-size: 14px;
+  }
+}

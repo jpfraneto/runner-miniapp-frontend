@@ -1,0 +1,287 @@
+@import "../../../../shared/styles/index.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+.primaryCard,
+.streakCard,
+.weeklyCard,
+.insightsCard {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.1) 0%,
+    rgba(204, 0, 0, 0.05) 100%
+  );
+  border: 2px solid #ff0000;
+  border-radius: 0;
+  padding: 16px;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 70%
+    );
+    animation: scanline 4s infinite;
+  }
+}
+
+.cardHeader {
+  margin-bottom: 16px;
+}
+
+.cardTitle {
+  color: #ff0000;
+  font-size: 18px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+// Primary Stats
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.statValue {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  line-height: 1;
+}
+
+.statLabel {
+  color: #cccccc;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+// Streak Card
+.streakContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.streakNumber {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.streakValue {
+  color: #00ff00;
+  font-size: 48px;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  line-height: 1;
+}
+
+.streakUnit {
+  color: #cccccc;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.streakStatus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.statusIndicator {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statusActive {
+  color: #00ff00;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.statusWarning {
+  color: #ffaa00;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.statusDanger {
+  color: #ff0000;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.bestStreak {
+  color: #999999;
+  font-size: 12px;
+}
+
+// Weekly Card
+.weeklyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.weeklyStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bestRun {
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.bestRunLabel {
+  color: #cccccc;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.bestRunDetails {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+// Insights Card
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.insight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.insightIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.insightText {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+// Loading and Error States
+.loadingCard,
+.errorCard {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0;
+  padding: 32px 16px;
+  text-align: center;
+  box-shadow: 0 4px 0 #000000, 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.loadingText,
+.errorText {
+  color: #cccccc;
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.retryButton {
+  background: #ff0000;
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+  }
+}
+
+// Animations
+@keyframes scanline {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// Responsive Design
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+    gap: 12px;
+  }
+
+  .statsGrid {
+    gap: 12px;
+  }
+
+  .statValue {
+    font-size: 20px;
+  }
+
+  .streakValue {
+    font-size: 36px;
+  }
+
+  .weeklyGrid {
+    gap: 8px;
+  }
+}

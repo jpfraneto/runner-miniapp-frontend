@@ -46,7 +46,9 @@
 
 .sortOptions {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 .sortButtons {
@@ -88,7 +90,39 @@
   gap: 12px;
   justify-content: center;
   align-items: center;
-  margin-bottom: 20px;
+}
+
+.timePeriodFilter {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.timePeriodButton {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #cccccc;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 70px;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+    color: #ffffff;
+    box-shadow: 0 1px 4px rgba(255, 0, 0, 0.3);
+  }
 }
 
 .leaderboardContainer {

@@ -7,19 +7,27 @@ import AppLayout from "@/shared/layouts/AppLayout";
 import UserProfile from "@/shared/components/UserProfile";
 
 // Hooks
-import { useLeaderboard, SortBy } from "@/shared/hooks/user";
+import { useLeaderboard, SortBy, TimePeriod } from "@/shared/hooks/user";
 
 // StyleSheet
 import styles from "./LeaderboardPage.module.scss";
 
 const LeaderboardPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortBy>("totalDistance");
-  const { data, isLoading, error, refetch } = useLeaderboard({ sortBy });
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("weekly");
+  const { data, isLoading, error, refetch } = useLeaderboard({
+    sortBy,
+    timePeriod,
+  });
   // const navigate = useNavigate();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const handleSortChange = (newSortBy: SortBy) => {
     setSortBy(newSortBy);
+  };
+
+  const handleTimePeriodChange = (newTimePeriod: TimePeriod) => {
+    setTimePeriod(newTimePeriod);
   };
 
   const handleUserClick = (userId: number) => {
@@ -109,6 +117,26 @@ const LeaderboardPage: React.FC = () => {
                 onClick={() => handleSortChange("totalTime")}
               >
                 Time
+              </button>
+            </div>
+
+            {/* Time Period Filter */}
+            <div className={styles.timePeriodFilter}>
+              <button
+                className={`${styles.timePeriodButton} ${
+                  timePeriod === "weekly" ? styles.active : ""
+                }`}
+                onClick={() => handleTimePeriodChange("weekly")}
+              >
+                Weekly
+              </button>
+              <button
+                className={`${styles.timePeriodButton} ${
+                  timePeriod === "all-time" ? styles.active : ""
+                }`}
+                onClick={() => handleTimePeriodChange("all-time")}
+              >
+                All Time
               </button>
             </div>
           </div>
