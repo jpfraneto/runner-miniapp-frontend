@@ -32,14 +32,6 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     setShowUploadFlow(false);
   };
 
-  const handleLogRun = () => {
-    sdk.haptics.selectionChanged();
-    sdk.actions.composeCast({
-      channelKey: "running",
-    });
-    //setShowUploadFlow(true);
-  };
-
   return (
     <div className={styles.layout}>
       {/* Sponsor Bar */}
@@ -66,7 +58,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
       <div className={styles.content}>{children}</div>
 
       <div className={styles.bar}>
-        <RunnerNavigationBar onLogRun={handleLogRun} />
+        <RunnerNavigationBar />
       </div>
 
       {showUploadFlow && (

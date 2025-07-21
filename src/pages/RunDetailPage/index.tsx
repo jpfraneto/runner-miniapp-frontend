@@ -55,7 +55,7 @@ const RunDetailPage: React.FC = () => {
   // Handle navigation back
   const handleGoBack = () => {
     sdk.haptics.selectionChanged();
-    navigate(-1);
+    navigate("/");
   };
 
   // Handle close
@@ -456,7 +456,7 @@ const RunDetailPage: React.FC = () => {
       <div className={styles.actions}>
         <Button
           variant="secondary"
-          caption="Share on Farcaster"
+          caption="Share"
           onClick={handleShare}
           iconLeft={<ShareIcon />}
           className={styles.shareButton}

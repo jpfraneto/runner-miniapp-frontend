@@ -4,23 +4,16 @@ import { createBrowserRouter } from "react-router-dom";
 // Pages
 import NotFoundPage from "../pages/NotFoundPage";
 import HomePage from "../pages/HomePage";
-import WelcomePage from "../pages/WelcomePage";
-import RunDetailPage from "../pages/RunDetailPage";
+import RunningSessionPage from "../pages/RunningSessionPage";
+import LeaderboardPage from "@/pages/LeaderboardPage";
+import ActivityPage from "@/pages/ActivityPage";
+import UserPage from "@/pages/UserPage";
 
 // Providers
 import { AppProvider } from "../shared/providers/AppProvider";
 
-import RankingPage from "@/pages/RankingPage";
-import LoginPage from "@/pages/LoginPage";
-import MiniAppPage from "@/pages/MiniAppPage";
-import CommunityPage from "@/pages/CommunityPage";
-import ProgressPage from "@/pages/ProgressPage";
-import CoachPage from "@/pages/CoachPage";
-import WorkoutPage from "@/pages/WorkoutPage";
-import LeaderboardPage from "@/pages/LeaderboardPage";
-
 /*
- * Router configuration for Farcaster miniapp.
+ * Router configuration for simplified running app.
  */
 export const router = createBrowserRouter([
   {
@@ -29,21 +22,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <MiniAppPage />,
-      },
-      {
-        path: "/home",
         element: <HomePage />,
       },
-      { path: "/welcome", element: <WelcomePage /> },
-      { path: "/ranking", element: <RankingPage /> },
-      { path: "/runs/:runId", element: <RunDetailPage /> },
-      { path: "/login", element: <LoginPage /> },
-      { path: "/community", element: <CommunityPage /> },
-      { path: "/progress", element: <ProgressPage /> },
-      { path: "/coach", element: <CoachPage /> },
-      { path: "/workout", element: <WorkoutPage /> },
+      { path: "/runs/:castHash", element: <RunningSessionPage /> },
+      { path: "/user/:fid", element: <UserPage /> },
       { path: "/leaderboard", element: <LeaderboardPage /> },
+      { path: "/activity", element: <ActivityPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

@@ -11,8 +11,16 @@ interface PersonalOverviewProps {
 }
 
 const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
-  const { data: analytics, isLoading: analyticsLoading, error: analyticsError } = useProgressAnalytics(fid);
-  const { data: weekly, isLoading: weeklyLoading, error: weeklyError } = useWeeklySummary(fid);
+  const {
+    data: analytics,
+    isLoading: analyticsLoading,
+    error: analyticsError,
+  } = useProgressAnalytics(fid);
+  const {
+    data: weekly,
+    isLoading: weeklyLoading,
+    error: weeklyError,
+  } = useWeeklySummary(fid);
 
   const isLoading = analyticsLoading || weeklyLoading;
   const hasError = analyticsError || weeklyError;
@@ -32,7 +40,10 @@ const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
       <div className={styles.container}>
         <div className={styles.errorCard}>
           <div className={styles.errorText}>Unable to load progress data</div>
-          <button className={styles.retryButton} onClick={() => window.location.reload()}>
+          <button
+            className={styles.retryButton}
+            onClick={() => window.location.reload()}
+          >
             Retry
           </button>
         </div>
@@ -42,12 +53,6 @@ const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
 
   const { personalStats } = analytics.data;
   const { weeklyStats, streakInfo } = weekly.data;
-
-  const getTrendIcon = (current: number, previous: number) => {
-    if (current > previous) return "↗️";
-    if (current < previous) return "↘️";
-    return "→";
-  };
 
   const formatTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
@@ -68,11 +73,15 @@ const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
             <div className={styles.statLabel}>Total Runs</div>
           </div>
           <div className={styles.stat}>
-            <div className={styles.statValue}>{personalStats.totalDistance.toFixed(1)}km</div>
+            <div className={styles.statValue}>
+              {personalStats.totalDistance.toFixed(1)}km
+            </div>
             <div className={styles.statLabel}>Distance</div>
           </div>
           <div className={styles.stat}>
-            <div className={styles.statValue}>{formatTime(personalStats.totalTime)}</div>
+            <div className={styles.statValue}>
+              {formatTime(personalStats.totalTime)}
+            </div>
             <div className={styles.statLabel}>Time</div>
           </div>
           <div className={styles.stat}>
@@ -89,18 +98,24 @@ const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
         </div>
         <div className={styles.streakContent}>
           <div className={styles.streakNumber}>
-            <span className={styles.streakValue}>{personalStats.currentStreak}</span>
+            <span className={styles.streakValue}>
+              {personalStats.currentStreak}
+            </span>
             <span className={styles.streakUnit}>days</span>
           </div>
           <div className={styles.streakStatus}>
-            <div className={`${styles.statusIndicator} ${
-              streakInfo.status === 'active' ? styles.statusActive :
-              streakInfo.status === 'at_risk' ? styles.statusWarning :
-              styles.statusDanger
-            }`}>
-              {streakInfo.status === 'active' && '🔥 On Fire!'}
-              {streakInfo.status === 'at_risk' && '⚠️ At Risk'}
-              {streakInfo.status === 'broken' && '💔 Broken'}
+            <div
+              className={`${styles.statusIndicator} ${
+                streakInfo.status === "active"
+                  ? styles.statusActive
+                  : streakInfo.status === "at_risk"
+                  ? styles.statusWarning
+                  : styles.statusDanger
+              }`}
+            >
+              {streakInfo.status === "active" && "🔥 On Fire!"}
+              {streakInfo.status === "at_risk" && "⚠️ At Risk"}
+              {streakInfo.status === "broken" && "💔 Broken"}
             </div>
             {personalStats.longestStreak > personalStats.currentStreak && (
               <div className={styles.bestStreak}>
@@ -122,7 +137,9 @@ const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
             <div className={styles.statLabel}>Runs</div>
           </div>
           <div className={styles.weeklyStat}>
-            <div className={styles.statValue}>{weeklyStats.totalDistance.toFixed(1)}km</div>
+            <div className={styles.statValue}>
+              {weeklyStats.totalDistance.toFixed(1)}km
+            </div>
             <div className={styles.statLabel}>Distance</div>
           </div>
           <div className={styles.weeklyStat}>
@@ -134,7 +151,8 @@ const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
           <div className={styles.bestRun}>
             <div className={styles.bestRunLabel}>Best Run This Week:</div>
             <div className={styles.bestRunDetails}>
-              {weeklyStats.bestRun.distance.toFixed(1)}km in {formatTime(weeklyStats.bestRun.time)}
+              {weeklyStats.bestRun.distance.toFixed(1)}km in{" "}
+              {formatTime(weeklyStats.bestRun.time)}
             </div>
           </div>
         )}
@@ -149,7 +167,8 @@ const PersonalOverview: React.FC<PersonalOverviewProps> = ({ fid }) => {
           <div className={styles.insight}>
             <div className={styles.insightIcon}>🏃‍♂️</div>
             <div className={styles.insightText}>
-              You've burned {personalStats.totalCalories.toLocaleString()} calories total
+              You've burned {personalStats.totalCalories.toLocaleString()}{" "}
+              calories total
             </div>
           </div>
           <div className={styles.insight}>

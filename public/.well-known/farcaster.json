@@ -13,6 +13,6 @@
     "buttonTitle": "Start Running",
     "splashImageUrl": "https://github.com/jpfraneto/images/blob/main/2_animation.gif?raw=true",
     "splashBackgroundColor": "#000000",
-    "webhookUrl": "https://poiesis.anky.app/notification-service/webhook"
+    "webhookUrl": "https://api.runnercoin.lat/notification-service/webhook"
   }
 }

@@ -4,10 +4,12 @@ import classNames from "clsx";
 import { useNavigate, useLocation } from "react-router-dom";
 
 // StyleSheet
-import styles from "./RunnerNavigationBar.module.scss";
+import styles from "./NavigationBar.module.scss";
 
 // Components
-import Typography from "../Typography";
+import HomeIcon from "./icons/HomeIcon";
+import RunningIcon from "./icons/RunningIcon";
+import LeaderboardIcon from "./icons/LeaderboardIcon";
 
 // Hooks
 import sdk from "@farcaster/frame-sdk";
@@ -23,31 +25,31 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
    */
   const handleClickHome = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp");
+    navigate("/");
   }, [navigate]);
 
   /**
-   * Handles navigation to workout page
+   * Handles navigation to running session page
    */
-  const handleClickWorkout = useCallback(() => {
+  const handleClickRunning = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp/workout");
+    navigate("/");
   }, [navigate]);
 
   /**
-   * Handles navigation to progress page
+   * Handles navigation to leaderboard page
    */
-  const handleClickProgress = useCallback(() => {
+  const handleClickLeaderboard = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp/progress");
+    navigate("/leaderboard");
   }, [navigate]);
 
   /**
-   * Handles navigation to community page
+   * Handles navigation to activity page
    */
-  const handleClickCommunity = useCallback(() => {
+  const handleClickActivity = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/miniapp/community");
+    navigate("/activity");
   }, [navigate]);
 
   /**
@@ -55,8 +57,10 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
    */
   const isActive = useCallback(
     (path: string) => {
-      if (path === "/miniapp" && location.pathname === "/miniapp") return true;
-      if (path !== "/miniapp" && location.pathname.startsWith(path))
+      if (path === "/" && location.pathname === "/") return true;
+      if (path === "/leaderboard" && location.pathname.startsWith("/leaderboard"))
+        return true;
+      if (path === "/activity" && location.pathname.startsWith("/activity"))
         return true;
       return false;
     },
@@ -68,61 +72,37 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
       {/* Home Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp"),
+          [styles.active]: isActive("/"),
         })}
         onClick={handleClickHome}
       >
         <div className={styles.iconWrapper}>
-          <div className={styles.icon}>🏠</div>
+          <HomeIcon className={styles.icon} />
         </div>
-        <Typography size={10} weight="medium" className={styles.label}>
-          Home
-        </Typography>
       </button>
 
-      {/* Workout Tab */}
+      {/* Leaderboard Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp/workout"),
+          [styles.active]: isActive("/leaderboard"),
         })}
-        onClick={handleClickWorkout}
+        onClick={handleClickLeaderboard}
       >
         <div className={styles.iconWrapper}>
-          <div className={styles.icon}>🏃‍♂️</div>
+          <LeaderboardIcon className={styles.icon} />
         </div>
-        <Typography size={10} weight="medium" className={styles.label}>
-          Workout
-        </Typography>
       </button>
 
-      {/* Progress Tab */}
+      {/* Activity Tab */}
       <button
         className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp/progress"),
+          [styles.active]: isActive("/activity"),
         })}
-        onClick={handleClickProgress}
+        onClick={handleClickActivity}
       >
         <div className={styles.iconWrapper}>
-          <div className={styles.icon}>📊</div>
+          <RunningIcon className={styles.icon} />
         </div>
-        <Typography size={10} weight="medium" className={styles.label}>
-          Progress
-        </Typography>
-      </button>
-
-      {/* Community Tab */}
-      <button
-        className={classNames(styles.tab, {
-          [styles.active]: isActive("/miniapp/community"),
-        })}
-        onClick={handleClickCommunity}
-      >
-        <div className={styles.iconWrapper}>
-          <div className={styles.icon}>👥</div>
-        </div>
-        <Typography size={10} weight="medium" className={styles.label}>
-          Community
-        </Typography>
       </button>
     </div>
   );

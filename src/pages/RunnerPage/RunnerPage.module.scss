@@ -1,0 +1,246 @@
+.container {
+  padding: 0 16px 100px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.loadingState,
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText,
+.errorText {
+  color: #666;
+  font-size: 14px;
+}
+
+.header {
+  margin-bottom: 24px;
+  padding: 20px 0;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.shareButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #007bff;
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.userInfo {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.userDetails {
+  flex: 1;
+}
+
+.displayName {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0 0 4px 0;
+  color: white;
+}
+
+.fid {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 12px 0;
+}
+
+.statsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.statItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.statIcon {
+  color: rgba(255, 255, 255, 0.8);
+  width: 24px;
+  height: 24px;
+}
+
+.statNumber {
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+}
+
+.chartSection {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin: 0 0 16px 0;
+  color: #000;
+}
+
+.chart {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+.runsSection {
+  margin-bottom: 32px;
+}
+
+.runsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.emptyState {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+.emptyText {
+  color: #666;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px 100px;
+  }
+
+  .userInfo {
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .displayName {
+    font-size: 20px;
+  }
+
+  .fid {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .statsGrid {
+    gap: 12px;
+  }
+
+  .statItem {
+    gap: 12px;
+  }
+
+  .statIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .statNumber {
+    font-size: 36px;
+  }
+
+  .chart {
+    padding: 20px 12px;
+  }
+
+  .chartContainer {
+    height: 150px;
+  }
+}

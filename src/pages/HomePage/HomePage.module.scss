@@ -1,70 +1,67 @@
 @import "@/styles/index.scss";
 
-.body {
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
   display: flex;
   flex-direction: column;
+  gap: 24px;
+}
+
+.weeklyStats {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.stat {
+  text-align: center;
   flex: 1;
-
-  overflow: hidden;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
+.statValue {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.2;
 }
 
-.titleSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.mainTitle {
-  color: #fff;
-  border: 1px solid black;
-}
-
-.subtitle {
+.statLabel {
+  display: block;
+  font-size: 12px;
   color: #6b7280;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.tabs {
-  width: 100%;
-  padding-top: 20px;
+.section {
+  h2 {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
 }
 
-.content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0 4px;
-  height: 86%;
-}
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+    gap: 20px;
+  }
 
-.quickActions {
-  padding: 16px 0;
-  padding-bottom: 40px;
-  display: flex;
-  justify-content: center;
-}
+  .weeklyStats {
+    padding: 16px;
+    gap: 16px;
+  }
 
-.logRunButton {
-  min-width: 160px;
-  height: 14%;
-}
-
-.runnerGif {
-  width: 222px;
-  height: 222px;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  img {
-    width: 100%;
+  .statValue {
+    font-size: 20px;
   }
 }

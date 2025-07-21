@@ -1,0 +1,300 @@
+.container {
+  padding: 0 16px;
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+}
+
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.channelInfo {
+  text-align: center;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.channelIcon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 16px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 3px solid #ff0000;
+  box-shadow: 0 4px 16px rgba(255, 0, 0, 0.3);
+}
+
+.channelImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.channelName {
+  font-size: 28px;
+  font-weight: bold;
+  color: #ff0000;
+  margin: 0 0 8px 0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.channelDescription {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.requirements {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.requirementsTitle {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  margin: 0 0 16px 0;
+}
+
+.requirementsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.requirementItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.requirementIcon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.requirementText {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.joinButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+  border: none;
+  border-radius: 16px;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(255, 0, 0, 0.3);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(255, 0, 0, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.buttonIcon {
+  flex-shrink: 0;
+}
+
+.cancelButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.infoNote {
+  background: rgba(0, 100, 255, 0.1);
+  border: 1px solid rgba(0, 100, 255, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: auto;
+}
+
+.infoText {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+  margin: 0;
+
+  strong {
+    color: #0066ff;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .channelName {
+    font-size: 24px;
+  }
+
+  .channelDescription {
+    font-size: 14px;
+  }
+
+  .requirementsTitle {
+    font-size: 18px;
+  }
+
+  .requirementText {
+    font-size: 14px;
+  }
+
+  .joinButton {
+    font-size: 16px;
+    padding: 14px 20px;
+  }
+
+  .cancelButton {
+    font-size: 14px;
+    padding: 14px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 8px;
+  }
+
+  .header {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .backButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .channelIcon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .channelName {
+    font-size: 20px;
+  }
+
+  .mainContent {
+    gap: 24px;
+  }
+
+  .requirements {
+    padding: 20px;
+  }
+
+  .requirementItem {
+    padding: 10px;
+  }
+
+  .actions {
+    gap: 12px;
+  }
+}

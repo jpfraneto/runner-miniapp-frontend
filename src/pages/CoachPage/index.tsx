@@ -20,7 +20,7 @@ const CoachPage: React.FC = () => {
   const [messages, _setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hey there! I'm your AI running coach. I'm here to help you stay motivated and improve your running performance. How can I help you today?",
+      text: "Hey there! I'm your AI running coach. I'm here to help you stay motivated and improve your running performance.",
       sender: "coach",
       timestamp: new Date(),
     },

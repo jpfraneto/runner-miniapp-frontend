@@ -1,0 +1,189 @@
+.container {
+  width: 100%;
+}
+
+.loading, .error, .empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.workoutsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.workoutItem {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #3b82f6;
+  }
+}
+
+.date {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.castIcon {
+  color: #6b7280;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+
+  .workoutItem:hover & {
+    opacity: 1;
+  }
+}
+
+.stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 12px;
+}
+
+.stat {
+  text-align: center;
+}
+
+.statValue {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.2;
+}
+
+.statLabel {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.comment {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.4;
+  border-left: 3px solid #3b82f6;
+}
+
+.loadMore, .viewMore {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.loadMoreButton, .viewMoreButton {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #2563eb;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.viewMoreButton {
+  background: #6b7280;
+
+  &:hover {
+    background: #4b5563;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats {
+    gap: 16px;
+  }
+
+  .statValue {
+    font-size: 16px;
+  }
+
+  .workoutItem {
+    padding: 12px;
+  }
+}

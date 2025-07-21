@@ -46,11 +46,7 @@
       }
     }
 
-    .label {
-      color: #ff0000;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-      font-weight: 600;
-    }
+    // No label styles needed
 
     &::after {
       content: "";
@@ -119,37 +115,38 @@
   }
 
   .icon {
-    font-size: 20px;
+    width: 20px;
+    height: 20px;
     transition: all 0.3s ease;
     filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.8));
   }
 }
 
-// Log Run Tab Styles
-.logRunTab {
+// Run Tab Styles
+.runTab {
   flex: 1.2;
   margin: 0 4px;
 
-  &:hover:not(.disabled) {
+  &:hover {
     transform: translateY(-3px);
 
-    .logRunIconWrapper {
+    .runIconWrapper {
       background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
       box-shadow: 0 6px 0 #000000, 0 12px 24px rgba(0, 255, 0, 0.4);
       transform: scale(1.05);
     }
   }
 
-  &:active:not(.disabled) {
+  &:active {
     transform: translateY(-1px);
 
-    .logRunIconWrapper {
+    .runIconWrapper {
       box-shadow: 0 2px 0 #000000, 0 4px 8px rgba(0, 255, 0, 0.3);
     }
   }
 }
 
-.logRunIconWrapper {
+.runIconWrapper {
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -180,24 +177,16 @@
     animation: scanline 3s infinite;
   }
 
-  .logRunIcon {
-    font-size: 24px;
+  .runIcon {
+    width: 24px;
+    height: 24px;
+    color: #000;
     transition: all 0.3s ease;
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.8));
   }
 }
 
-.label {
-  color: rgba(255, 255, 255, 0.8);
-  transition: all 0.3s ease;
-  font-size: 11px;
-  line-height: 14px;
-  text-align: center;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
+// Remove label styles since we no longer have text labels
 
 // Animations
 @keyframes scanline {
@@ -224,22 +213,19 @@
     height: 40px;
 
     .icon {
-      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
   }
 
-  .logRunIconWrapper {
+  .runIconWrapper {
     width: 48px;
     height: 48px;
 
-    .logRunIcon {
-      font-size: 22px;
+    .runIcon {
+      width: 22px;
+      height: 22px;
     }
-  }
-
-  .label {
-    font-size: 10px;
-    line-height: 12px;
   }
 }
 
@@ -254,21 +240,18 @@
     height: 36px;
 
     .icon {
-      font-size: 16px;
+      width: 16px;
+      height: 16px;
     }
   }
 
-  .logRunIconWrapper {
+  .runIconWrapper {
     width: 44px;
     height: 44px;
 
-    .logRunIcon {
-      font-size: 20px;
+    .runIcon {
+      width: 20px;
+      height: 20px;
     }
-  }
-
-  .label {
-    font-size: 9px;
-    line-height: 11px;
   }
 }

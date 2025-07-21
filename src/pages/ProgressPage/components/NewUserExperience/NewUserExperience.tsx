@@ -3,10 +3,10 @@ import React from "react";
 import styles from "./NewUserExperience.module.scss";
 
 interface NewUserExperienceProps {
-  fid: number;
+  // fid parameter removed as it's not used
 }
 
-const NewUserExperience: React.FC<NewUserExperienceProps> = ({ fid }) => {
+const NewUserExperience: React.FC<NewUserExperienceProps> = () => {
   return (
     <div className={styles.container}>
       {/* Welcome Message */}
@@ -14,7 +14,7 @@ const NewUserExperience: React.FC<NewUserExperienceProps> = ({ fid }) => {
         <div className={styles.welcomeIcon}>🏃‍♂️</div>
         <h2 className={styles.welcomeTitle}>Welcome to Runner!</h2>
         <p className={styles.welcomeText}>
-          Start your running journey and unlock detailed progress analytics, 
+          Start your running journey and unlock detailed progress analytics,
           community comparisons, and personal insights.
         </p>
       </div>
@@ -50,28 +50,36 @@ const NewUserExperience: React.FC<NewUserExperienceProps> = ({ fid }) => {
             <div className={styles.featureIcon}>📊</div>
             <div className={styles.featureText}>
               <div className={styles.featureTitle}>Personal Analytics</div>
-              <div className={styles.featureDesc}>Track progress, trends, and improvements</div>
+              <div className={styles.featureDesc}>
+                Track progress, trends, and improvements
+              </div>
             </div>
           </div>
           <div className={styles.feature}>
             <div className={styles.featureIcon}>🏆</div>
             <div className={styles.featureText}>
               <div className={styles.featureTitle}>Community Rankings</div>
-              <div className={styles.featureDesc}>See how you compare to other runners</div>
+              <div className={styles.featureDesc}>
+                See how you compare to other runners
+              </div>
             </div>
           </div>
           <div className={styles.feature}>
             <div className={styles.featureIcon}>🔥</div>
             <div className={styles.featureText}>
               <div className={styles.featureTitle}>Streak Tracking</div>
-              <div className={styles.featureDesc}>Build and maintain running streaks</div>
+              <div className={styles.featureDesc}>
+                Build and maintain running streaks
+              </div>
             </div>
           </div>
           <div className={styles.feature}>
             <div className={styles.featureIcon}>💡</div>
             <div className={styles.featureText}>
               <div className={styles.featureTitle}>Smart Insights</div>
-              <div className={styles.featureDesc}>Data-driven tips to improve performance</div>
+              <div className={styles.featureDesc}>
+                Data-driven tips to improve performance
+              </div>
             </div>
           </div>
         </div>
@@ -82,11 +90,10 @@ const NewUserExperience: React.FC<NewUserExperienceProps> = ({ fid }) => {
         <div className={styles.ctaContent}>
           <h3 className={styles.ctaTitle}>Ready to Start?</h3>
           <p className={styles.ctaText}>
-            Log your first run to begin tracking your progress and unlock all features.
+            Log your first run to begin tracking your progress and unlock all
+            features.
           </p>
-          <button className={styles.ctaButton}>
-            Log Your First Run
-          </button>
+          <button className={styles.ctaButton}>Log Your First Run</button>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@
 import { request } from "./api";
 
 // Configuration
-import { BRAND_SERVICE, USER_SERVICE, TRAINING_SERVICE } from "@/config/api";
+import { BRAND_SERVICE, USER_SERVICE, TRAINING_SERVICE, AUTH_SERVICE } from "@/config/api";
 
 // Types
 import {
@@ -40,6 +40,14 @@ export interface ShareVerificationResponse {
   newTotalPoints: number;
   message: string;
 }
+
+/**
+ * Get current authenticated user info
+ */
+export const getMe = async () =>
+  await request(`${AUTH_SERVICE}/me`, {
+    method: "GET",
+  });
 
 /**
  * Retrieves the vote history of a user from the user service.
@@ -395,5 +403,15 @@ export const updateWorkout = async (
  */
 export const getUserProfile = async (fid: number) =>
   await request<any>(`${USER_SERVICE}/user/${fid}`, {
+    method: "GET",
+  });
+
+/**
+ * Fetch a running session by cast hash
+ * @param castHash - The cast hash to fetch the running session for
+ * @returns Promise with running session data including user details and intervals
+ */
+export const getRunningSessionByCastHash = async (castHash: string) =>
+  await request<RunningSession>(`${TRAINING_SERVICE}/runs/${castHash}`, {
     method: "GET",
   });

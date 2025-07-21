@@ -8,7 +8,6 @@ import sdk from "@farcaster/frame-sdk";
 interface UserProfileProps {
   userId: number;
   onBack: () => void;
-  onEdit: (workout: RunningSession) => void;
 }
 
 interface UserStats {
@@ -125,11 +124,7 @@ function formatTimeMinutes(totalMinutes: number) {
   return result.trim();
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({
-  userId,
-  onBack,
-  onEdit,
-}) => {
+const UserProfile: React.FC<UserProfileProps> = ({ userId, onBack }) => {
   const { profileData, isLoading, error } = useUserProfile(userId);
   console.log("THE PROFILE DATA HERE IS:", profileData);
 
@@ -315,12 +310,7 @@ const UserProfile: React.FC<UserProfileProps> = ({
         {workouts.length > 0 ? (
           <div className={styles.workoutsList}>
             {workouts.map((workout) => (
-              <RunningSessionComponent
-                key={workout.id}
-                workout={workout}
-                isOwner={false}
-                onEdit={onEdit}
-              />
+              <RunningSessionComponent key={workout.id} workout={workout} />
             ))}
           </div>
         ) : (
