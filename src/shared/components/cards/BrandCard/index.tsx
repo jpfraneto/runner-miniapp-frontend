@@ -9,7 +9,8 @@ import styles from "./BrandCard.module.scss";
 import Typography from "../../Typography";
 
 // Hooks
-import { BrandStateScoreType } from "@/hooks/brands";
+// import { BrandStateScoreType } from "@/hooks/brands";
+type BrandStateScoreType = any;
 
 // Utils
 import { shortenNumber } from "@/utils/number";

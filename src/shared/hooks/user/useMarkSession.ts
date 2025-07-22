@@ -20,7 +20,7 @@ export const useMarkSession = () => {
 
   return useMutation({
     mutationFn: ({ sessionId, didComplete }: MarkSessionData) =>
-      markSessionCompleted(sessionId, didComplete),
+      markSessionCompleted(sessionId, didComplete) as Promise<MarkSessionResponse>,
 
     onSuccess: (_data: MarkSessionResponse, variables) => {
       // Invalidate relevant queries to refresh data

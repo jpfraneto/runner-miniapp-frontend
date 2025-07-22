@@ -12,11 +12,14 @@ import Typography from "@/components/Typography";
 import styles from "./RankPodiums.module.scss";
 
 // Hook
-import { Brand, useBrandList } from "@/hooks/brands";
+// import { Brand, useBrandList } from "@/hooks/brands";
+type Brand = any;
+const useBrandList = (..._args: any[]) => ({ data: { brands: [] }, refetch: () => {} });
 import useDisableScrollBody from "@/hooks/ui/useDisableScrollBody";
 
 // Utils
-import { getBrandScoreVariation } from "@/utils/brand";
+// import { getBrandScoreVariation } from "@/utils/brand";
+const getBrandScoreVariation = (..._args: any[]) => ({});
 
 const RankPodiums = () => {
   const navigate = useNavigate();

@@ -4,28 +4,39 @@
   @include baseLayout();
   position: relative;
   height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  padding: 0 4px 0 4px;
+  background: linear-gradient(135deg, #8b4513, #654321);
+  font-family: "Courier New", monospace;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 .content {
-  flex: 0.85; // Takes up 85% of the space
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  background: linear-gradient(135deg, #8b4513, #654321);
 }
 
 .bar {
-  flex: 0.15; // Takes up 15% of the space
+  flex: 0.15;
   width: 100%;
   @include baseLayout();
   bottom: 0;
   z-index: 500;
-  background: var(--background-color, #000);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(90deg, #2a1810, #3d2315);
+  border-top: 4px solid #8b4513;
+  box-shadow: inset 0 2px 0px #654321, 0 -4px 8px rgba(0, 0, 0, 0.5);
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
 .sponsorBar {

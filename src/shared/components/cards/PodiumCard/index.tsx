@@ -11,7 +11,8 @@ import Typography from "@/components/Typography";
 import styles from "./PodiumCard.module.scss";
 
 // Types
-import { BrandStateScoreType } from "@/hooks/brands";
+// import { BrandStateScoreType } from "@/hooks/brands";
+type BrandStateScoreType = any;
 
 interface PodiumCardProps {
   position: number;

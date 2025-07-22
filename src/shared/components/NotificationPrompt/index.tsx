@@ -8,13 +8,9 @@ import sdk from "@farcaster/frame-sdk";
 
 const NotificationPrompt: React.FC<NotificationPromptProps> = ({
   onComplete,
-  points = 0,
   userFid,
 }) => {
   const { state, actions } = useNotificationPrompt(userFid, onComplete);
-
-  // Determine if this is being shown on app load vs after voting
-  const isAppLoadContext = points === 0;
 
   if (state.isAdded) {
     return (
@@ -27,12 +23,10 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({
             size={20}
             className={styles.successTitle}
           >
-            You're all set!
+            $runner added
           </Typography>
           <Typography size={14} className={styles.successText}>
-            {isAppLoadContext
-              ? "Welcome to BRND! We'll keep you updated with the latest."
-              : "We'll remind you to vote daily so you never miss earning points"}
+            You’ll get updates from $runner.
           </Typography>
         </div>
       </div>
@@ -42,12 +36,10 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <div className={styles.icon}>🔔</div>
+        <div className={styles.icon}>🏃‍♂️</div>
 
         <Typography size={14} className={styles.description}>
-          {isAppLoadContext
-            ? "add $runner miniapp to your apps. i don't know why yet, but you will be first."
-            : ``}
+          Add $runner to your apps. Stay in the loop.
         </Typography>
 
         <div className={styles.benefits}></div>

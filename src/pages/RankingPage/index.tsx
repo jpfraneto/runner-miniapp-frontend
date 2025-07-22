@@ -15,14 +15,14 @@ import TabNavigator from "@/components/TabNavigator";
 // Hocs
 import withProtectionRoute from "@/hocs/withProtectionRoute";
 import Typography from "@/shared/components/Typography";
-import BrandHeader from "@/shared/components/BrandHeader";
+// import BrandHeader from "@/shared/components/BrandHeader";
 
 function RankingPage(): React.ReactNode {
   return (
     <AppLayout>
       <div className={styles.body}>
         <div className={styles.header}>
-          <BrandHeader />
+          {/* <BrandHeader /> */}
           <div className={styles.description}>
             <Typography
               variant="geist"

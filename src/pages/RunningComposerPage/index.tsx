@@ -3,9 +3,6 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import sdk from "@farcaster/frame-sdk";
 
-// Components
-import LogTodaysRunButton from "@/shared/components/LogTodaysRunButton";
-
 const RunningComposerPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -16,7 +13,7 @@ const RunningComposerPage: React.FC = () => {
         // Use composeCast instead of openCastComposer
         await sdk.actions.composeCast({
           text: "Just finished my run! 🏃‍♂️",
-          embeds: []
+          embeds: [],
         });
         console.log("Cast composer opened successfully");
       } catch (error) {
@@ -35,7 +32,6 @@ const RunningComposerPage: React.FC = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
-        padding: "20px",
         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
       }}
     >
@@ -47,12 +43,7 @@ const RunningComposerPage: React.FC = () => {
           Share your running session with the community
         </p>
       </div>
-      
-      <LogTodaysRunButton 
-        isInsideMiniapp={true}
-        setIsInsideMiniapp={() => {}}
-      />
-      
+
       <button
         onClick={() => navigate("/home")}
         style={{

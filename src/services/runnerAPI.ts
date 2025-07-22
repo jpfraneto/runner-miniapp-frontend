@@ -1,7 +1,23 @@
 import { request } from "./api";
-import { AUTH_SERVICE, LEADERBOARD_SERVICE, WORKOUTS_SERVICE } from "@/config/api";
+import {
+  AUTH_SERVICE,
+  LEADERBOARD_SERVICE,
+  TRAINING_SERVICE,
+  USER_SERVICE,
+} from "@/config/api";
 import { Leaderboard } from "@/shared/types/leaderboard";
-import { Workout } from "@/shared/types/workout";
+import { RunningSession } from "@/shared/types/running";
+
+export interface WorkoutApiResponse {
+  runs: RunningSession[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+  };
+}
 
 // Authentication
 export const getMe = async () =>
@@ -37,27 +53,28 @@ export const getWeeklyLeaderboard = async (
   });
 
 // Workouts
-export const getRecentWorkouts = async (limit: number = 50): Promise<Workout[]> =>
-  await request<Workout[]>(`${WORKOUTS_SERVICE}/recent`, {
+export const getRecentWorkouts = async (
+  limit: number = 50
+): Promise<WorkoutApiResponse> =>
+  await request<WorkoutApiResponse>(`${TRAINING_SERVICE}/recent`, {
     method: "GET",
     params: {
       limit: String(limit),
     },
   });
 
-export const getCurrentWeekWorkouts = async (): Promise<Workout[]> =>
-  await request<Workout[]>(`${WORKOUTS_SERVICE}/current-week`, {
+export const getCurrentWeekWorkouts = async (): Promise<WorkoutApiResponse> =>
+  await request<WorkoutApiResponse>(`${TRAINING_SERVICE}/current-week`, {
     method: "GET",
   });
 
 export const getUserWorkouts = async (
   fid: number,
   limit: number = 20
-): Promise<Workout[]> =>
-  await request<Workout[]>(`${WORKOUTS_SERVICE}/user`, {
+): Promise<WorkoutApiResponse> =>
+  await request<WorkoutApiResponse>(`${USER_SERVICE}/${fid}`, {
     method: "GET",
     params: {
-      fid: String(fid),
       limit: String(limit),
     },
   });
@@ -68,5 +85,15 @@ export const processNewCast = async (castHash: string) =>
     method: "GET",
     params: {
       castHash,
+    },
+  });
+
+// Flag running session
+export const flagRunningSession = async (castHash: string) =>
+  await request(`${TRAINING_SERVICE}/flag-run`, {
+    method: "POST",
+    body: { castHash },
+    headers: {
+      "Content-Type": "application/json",
     },
   });

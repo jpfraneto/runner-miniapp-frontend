@@ -5,12 +5,18 @@ import { useNavigate } from "react-router-dom";
 import Typography from "@/shared/components/Typography";
 import LoaderIndicator from "@/shared/components/LoaderIndicator";
 import NotificationPrompt from "@/shared/components/NotificationPrompt";
+import ShareRunView from "@/shared/components/ShareRunView";
+import ShareSuccessView from "@/shared/components/ShareSuccessView";
+import Button from "@/shared/components/Button";
 
 // Context
 import { AuthContext } from "@/shared/providers/AppProvider";
 
 // Services
 import { processCast } from "@/services/castProcessing";
+
+// Types
+import { RunShareVerificationResponse } from "@/services/user";
 
 // Styles
 import styles from "./CastProcessingScreen.module.scss";
@@ -22,6 +28,8 @@ interface CastProcessingScreenProps {
   onComplete: (runData?: any) => void;
 }
 
+type ViewState = "processing" | "complete" | "share" | "shareSuccess";
+
 const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
   castHash,
   text,
@@ -31,7 +39,11 @@ const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
   const navigate = useNavigate();
   const { miniappContext } = useContext(AuthContext);
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false);
-  const [processingComplete, setProcessingComplete] = useState(false);
+  const [_processingComplete, setProcessingComplete] = useState(false);
+  const [currentView, setCurrentView] = useState<ViewState>("processing");
+  const [processedRunData, setProcessedRunData] = useState<any>(null);
+  const [shareVerificationResult, setShareVerificationResult] =
+    useState<RunShareVerificationResponse | null>(null);
 
   useEffect(() => {
     // Call the backend to process the cast
@@ -50,6 +62,8 @@ const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
         if (response.success) {
           // Cast was processed successfully
           setProcessingComplete(true);
+          setCurrentView("complete");
+          setProcessedRunData(response.data);
           setShowNotificationPrompt(true);
 
           // Call onComplete with the processed data
@@ -58,12 +72,14 @@ const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
           console.error("Failed to process cast:", response.message);
           // Handle error - could show error state or retry
           setProcessingComplete(true);
+          setCurrentView("complete");
           setShowNotificationPrompt(true);
         }
       } catch (error) {
         console.error("Error processing cast:", error);
         // Handle error - could show error state or retry
         setProcessingComplete(true);
+        setCurrentView("complete");
         setShowNotificationPrompt(true);
       }
     };
@@ -73,13 +89,50 @@ const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
 
   const handleNotificationComplete = () => {
     setShowNotificationPrompt(false);
+  };
+
+  const handleShareRun = () => {
+    setCurrentView("share");
+  };
+
+  const handleSkipShare = () => {
     onComplete();
     navigate("/");
   };
 
+  const handleShareSuccess = (result: RunShareVerificationResponse) => {
+    setShareVerificationResult(result);
+    setCurrentView("shareSuccess");
+  };
+
+  const handleShareSuccessComplete = () => {
+    onComplete();
+    navigate("/");
+  };
+
+  // Handle different view states
+  if (currentView === "share" && processedRunData?.runningSession) {
+    return (
+      <ShareRunView
+        runData={processedRunData.runningSession}
+        onSkip={handleSkipShare}
+        onSuccess={handleShareSuccess}
+      />
+    );
+  }
+
+  if (currentView === "shareSuccess" && shareVerificationResult) {
+    return (
+      <ShareSuccessView
+        verificationResult={shareVerificationResult}
+        onContinue={handleShareSuccessComplete}
+      />
+    );
+  }
+
   return (
     <div className={styles.container}>
-      {!processingComplete ? (
+      {currentView === "processing" ? (
         <div className={styles.processingContent}>
           <div className={styles.icon}>🏃‍♂️</div>
 
@@ -139,7 +192,7 @@ const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
             Your run has been successfully processed and added to your profile.
           </Typography>
 
-          {showNotificationPrompt && (
+          {showNotificationPrompt && !processedRunData ? (
             <div className={styles.notificationPrompt}>
               <NotificationPrompt
                 userFid={miniappContext?.user?.fid || 0}
@@ -147,7 +200,28 @@ const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
                 points={0}
               />
             </div>
-          )}
+          ) : processedRunData?.runningSession ? (
+            <div className={styles.shareActions}>
+              <Typography size={14} className={styles.sharePrompt}>
+                Share your achievement with the community?
+              </Typography>
+
+              <div className={styles.actionButtons}>
+                <Button
+                  variant="primary"
+                  caption="Share Run"
+                  onClick={handleShareRun}
+                  className={styles.shareButton}
+                />
+
+                <Button
+                  variant="underline"
+                  caption="Skip for now"
+                  onClick={handleSkipShare}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
     </div>

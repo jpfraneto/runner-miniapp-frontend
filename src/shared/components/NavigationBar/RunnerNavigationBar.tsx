@@ -11,12 +11,15 @@ import RunningIcon from "./icons/RunningIcon";
 import LeaderboardIcon from "./icons/LeaderboardIcon";
 
 // Components
-import CastProcessingScreen from "@/shared/components/CastProcessingScreen";
+import CastVerificationScreen from "@/shared/components/CastVerificationScreen";
 
 // Hooks
 import sdk from "@farcaster/frame-sdk";
 import { useNavigate } from "react-router-dom";
 import { useProcessingRuns } from "@/shared/providers/ProcessingRunsProvider";
+
+// Services
+import { verifyAndProcessCast } from "@/services/user";
 
 interface RunnerNavigationBarProps {}
 
@@ -29,6 +32,22 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
     text: string;
     embeds: string[];
   } | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<{
+    success: boolean;
+    verified: boolean;
+    isWorkoutImage: boolean;
+    replyData?: {
+      castHash: string;
+      text: string;
+      message: string;
+    };
+    run?: {
+      distanceMeters?: number;
+      duration?: number;
+    };
+    message: string;
+  } | null>(null);
 
   const isActive = (path: string) => {
     const currentPath = window.location.pathname;
@@ -40,12 +59,13 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
   };
 
   /**
-   * Handles the run button click - checks channel membership and opens cast composer
+   * Handles the run button click - opens cast composer and verifies/processes the cast
    */
   const handleClickLogRun = useCallback(async () => {
     sdk.haptics.selectionChanged();
 
     try {
+      console.log("COMPOSING A NEW CAT");
       // Open cast composer
       const response = await sdk.actions.composeCast({
         text: "[insert run details and screenshots here]",
@@ -55,7 +75,7 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
 
       console.log("Cast response:", response);
 
-      // If cast was successful, show processing screen
+      // If cast was successful, send to training-service for verification and processing
       if (response && response.cast && response.cast.hash) {
         const processingRun = {
           id: `processing-${Date.now()}`,
@@ -74,6 +94,40 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
           embeds: response.cast.embeds || [],
         });
         setShowProcessingScreen(true);
+        setIsVerifying(true);
+
+        try {
+          // Call training-service to verify and process the cast
+          const verificationResponse = await verifyAndProcessCast({
+            castHash: response.cast.hash,
+            text: response.cast.text || "",
+            embeds: response.cast.embeds || [],
+          });
+
+          console.log("Cast verification response:", verificationResponse);
+
+          setVerificationResult(verificationResponse);
+          setIsVerifying(false);
+
+          // Show result in processing screen
+          if (verificationResponse.verified) {
+            console.log("✅ Cast verified and processed successfully");
+          } else {
+            console.log(
+              "❌ Cast verification failed:",
+              verificationResponse.message
+            );
+          }
+        } catch (verificationError) {
+          console.error("Cast verification error:", verificationError);
+          setIsVerifying(false);
+          setVerificationResult({
+            success: false,
+            verified: false,
+            isWorkoutImage: false,
+            message: "Failed to verify cast. Please try again.",
+          });
+        }
       }
     } catch (error) {
       console.error("Failed to compose cast:", error);
@@ -83,6 +137,8 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
   const handleProcessingComplete = () => {
     setShowProcessingScreen(false);
     setProcessingData(null);
+    setIsVerifying(false);
+    setVerificationResult(null);
     navigate("/");
   };
 
@@ -128,12 +184,14 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
         </button>
       </div>
 
-      {/* Cast Processing Screen */}
+      {/* Cast Verification Screen */}
       {showProcessingScreen && processingData && (
-        <CastProcessingScreen
+        <CastVerificationScreen
           castHash={processingData.castHash}
           text={processingData.text}
           embeds={processingData.embeds}
+          isVerifying={isVerifying}
+          verificationResult={verificationResult}
           onComplete={handleProcessingComplete}
         />
       )}

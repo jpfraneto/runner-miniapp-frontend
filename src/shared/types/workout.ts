@@ -1,13 +1,12 @@
 export interface Workout {
-  id: number;
   fid: number;
-  username: string;
-  pfpUrl: string;
-  meters: number;
-  minutes: number;
-  kilometers: string;
-  pace: string;
+  distanceMeters: string;
+  duration: number;
   castHash: string;
-  comment?: string;
   createdAt: string;
+  user: {
+    fid: number;
+    username: string;
+    pfpUrl: string;
+  };
 }

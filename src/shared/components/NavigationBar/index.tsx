@@ -28,13 +28,6 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
     navigate("/");
   }, [navigate]);
 
-  /**
-   * Handles navigation to running session page
-   */
-  const handleClickRunning = useCallback(() => {
-    sdk.haptics.selectionChanged();
-    navigate("/");
-  }, [navigate]);
 
   /**
    * Handles navigation to leaderboard page
@@ -45,11 +38,11 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
   }, [navigate]);
 
   /**
-   * Handles navigation to activity page
+   * Handles navigation to create running session page
    */
-  const handleClickActivity = useCallback(() => {
+  const handleClickCreate = useCallback(() => {
     sdk.haptics.selectionChanged();
-    navigate("/activity");
+    navigate("/create");
   }, [navigate]);
 
   /**
@@ -60,7 +53,7 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
       if (path === "/" && location.pathname === "/") return true;
       if (path === "/leaderboard" && location.pathname.startsWith("/leaderboard"))
         return true;
-      if (path === "/activity" && location.pathname.startsWith("/activity"))
+      if (path === "/create" && location.pathname.startsWith("/create"))
         return true;
       return false;
     },
@@ -81,6 +74,18 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
         </div>
       </button>
 
+      {/* Create Tab */}
+      <button
+        className={classNames(styles.tab, {
+          [styles.active]: isActive("/create"),
+        })}
+        onClick={handleClickCreate}
+      >
+        <div className={styles.iconWrapper}>
+          <RunningIcon className={styles.icon} />
+        </div>
+      </button>
+
       {/* Leaderboard Tab */}
       <button
         className={classNames(styles.tab, {
@@ -90,18 +95,6 @@ const NavigationBar: React.FC<NavigationBarProps> = () => {
       >
         <div className={styles.iconWrapper}>
           <LeaderboardIcon className={styles.icon} />
-        </div>
-      </button>
-
-      {/* Activity Tab */}
-      <button
-        className={classNames(styles.tab, {
-          [styles.active]: isActive("/activity"),
-        })}
-        onClick={handleClickActivity}
-      >
-        <div className={styles.iconWrapper}>
-          <RunningIcon className={styles.icon} />
         </div>
       </button>
     </div>

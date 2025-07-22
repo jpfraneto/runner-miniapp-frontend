@@ -1,6 +1,6 @@
 import { NotificationSettings } from "@/shared/components/NotificationPrompt/types";
 
-const STORAGE_KEY_PREFIX = "brnd_notification_";
+const STORAGE_KEY_PREFIX = "runnercoin_notification_";
 const PROMPT_COOLDOWN_DAYS = 3; // Don't prompt again for 3 days if dismissed
 
 /**

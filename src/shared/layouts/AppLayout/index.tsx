@@ -1,6 +1,6 @@
 // src/shared/layouts/AppLayout/index.tsx
 
-import React, { useState } from "react";
+import React from "react";
 
 // Components
 // import NavigationBar from "@/components/NavigationBar";
@@ -8,12 +8,9 @@ import RunnerNavigationBar from "@/shared/components/NavigationBar/RunnerNavigat
 
 // StyleSheet
 import styles from "./AppLayout.module.scss";
-import WorkoutUploadFlow from "@/shared/components/WorkoutUploadFlow";
-import { CompletedRun } from "@/shared/hooks/user/useUploadWorkout";
 
 // Hooks
 // import { useAuth } from "@/hooks/auth";
-import sdk from "@farcaster/frame-sdk";
 
 interface AppLayoutProps {
   readonly children: React.ReactNode;
@@ -21,21 +18,11 @@ interface AppLayoutProps {
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   // const { data: user } = useAuth();
-  const [showUploadFlow, setShowUploadFlow] = useState(false);
-
-  const handleUploadComplete = (_completedRun: CompletedRun) => {
-    setShowUploadFlow(false);
-    sdk.haptics.notificationOccurred("success");
-  };
-
-  const handleCloseUploadFlow = () => {
-    setShowUploadFlow(false);
-  };
 
   return (
     <div className={styles.layout}>
       {/* Sponsor Bar */}
-      <div
+      {/* <div
         className={styles.sponsorBar}
         onClick={() => {
           sdk.actions.swapToken({
@@ -54,19 +41,12 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
             </span>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className={styles.content}>{children}</div>
 
       <div className={styles.bar}>
         <RunnerNavigationBar />
       </div>
-
-      {showUploadFlow && (
-        <WorkoutUploadFlow
-          onComplete={handleUploadComplete}
-          onClose={handleCloseUploadFlow}
-        />
-      )}
     </div>
   );
 };

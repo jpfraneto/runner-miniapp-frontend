@@ -34,8 +34,8 @@ import sdk from "@farcaster/frame-sdk";
  */
 const steps: Array<[string[], string, React.ReactNode]> = [
   [
-    ["Score", "your favourite brands"],
-    "Build your daily podiums to rank and discover the Farcaster ecosystem brands.",
+    ["Log", "your runs"],
+    "Track your daily runs and see your progress with $runner.",
     <img
       key={0}
       src={WelcomeImage1}
@@ -45,8 +45,8 @@ const steps: Array<[string[], string, React.ReactNode]> = [
     />,
   ],
   [
-    ["Earn", "brnd points"],
-    "Boost your top brands and win with them",
+    ["Earn", "$runner rewards"],
+    "Get rewarded for every run you log.",
     <img
       key={0}
       src={WelcomeImage2}
@@ -56,8 +56,8 @@ const steps: Array<[string[], string, React.ReactNode]> = [
     />,
   ],
   [
-    ["Share", "on miniapp"],
-    "Engage your close community by sharing your favorite brands from the ecosystem",
+    ["Share", "with your crew"],
+    "Share your runs and stats with friends on $runner.",
     <img
       key={0}
       src={WelcomeImage3}
@@ -73,17 +73,17 @@ function WelcomePage(): React.ReactNode {
   const navigate = useNavigate();
 
   /**
-   * Handles the click event to skip the tutorial and navigate to the podium page.
+   * Handles the click event to skip the tutorial and navigate to the main page.
    *
    * @returns {void}
    */
   const handleClickSkipTutorial = useCallback((): void => {
-    navigate("/vote");
+    navigate("/home");
   }, []);
 
   /**
    * Handles the click event to navigate to the next step in the tutorial.
-   * If the current step is the last one, it navigates to the podium page.
+   * If the current step is the last one, it navigates to the main page.
    *
    * @returns {void}
    */
@@ -92,7 +92,7 @@ function WelcomePage(): React.ReactNode {
     if (stepId < steps.length - 1) {
       setStepId(stepId + 1);
     } else {
-      navigate("/vote");
+      navigate("/home");
     }
   }, [stepId, navigate]);
 

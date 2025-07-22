@@ -1,8 +1,7 @@
 .container {
   background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px 0;
+  width: 100%;
 }
 
 .header {
@@ -10,12 +9,14 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+  padding: 0 16px;
 
   h2 {
     margin: 0;
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
     color: #1a1a1a;
+    font-family: "Druk Wide", sans-serif;
   }
 }
 
@@ -23,27 +24,31 @@
   background: #22c55e;
   color: white;
   padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  border-radius: 12px;
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .navigation {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   justify-content: center;
+  padding: 0 16px;
 }
 
 .navButton {
-  padding: 8px 16px;
+  padding: 8px 12px;
   border: 1px solid #e5e7eb;
   background: white;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 500;
   transition: all 0.2s;
+  color: #374151;
 
   &:hover:not(:disabled) {
     background: #f3f4f6;
@@ -56,130 +61,217 @@
   }
 }
 
-.loading, .error, .empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  text-align: center;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid #f3f4f6;
-  border-top: 3px solid #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 12px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 .leaderboardList {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 1px;
+  background: #f3f4f6;
 }
 
 .leaderboardItem {
   display: flex;
   align-items: center;
-  padding: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 12px 16px;
+  background: white;
   cursor: pointer;
   transition: all 0.2s;
-  background: white;
+  border: none;
+  width: 100%;
 
   &:hover {
     background: #f9fafb;
-    border-color: #d1d5db;
   }
 
   &.gold {
-    border-color: #fbbf24;
     background: linear-gradient(135deg, #fef3c7 0%, #ffffff 100%);
+    border-left: 4px solid #f59e0b;
   }
 
   &.silver {
-    border-color: #9ca3af;
     background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
+    border-left: 4px solid #6b7280;
   }
 
   &.bronze {
-    border-color: #d97706;
     background: linear-gradient(135deg, #fed7aa 0%, #ffffff 100%);
+    border-left: 4px solid #d97706;
   }
 }
 
 .position {
-  min-width: 60px;
+  min-width: 40px;
   text-align: center;
+  margin-right: 12px;
 }
 
 .rank {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
-  color: #374151;
+  color: #6b7280;
+  font-family: "Monaco", "Menlo", monospace;
+}
+
+.avatar {
+  margin-right: 12px;
+}
+
+.avatarPlaceholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
 }
 
 .userInfo {
   flex: 1;
-  margin-left: 16px;
 }
 
 .username {
   font-size: 16px;
   font-weight: 600;
   color: #1f2937;
+  font-family: "Geist", sans-serif;
 }
 
 .stats {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   align-items: center;
+  margin-left: auto;
 }
 
 .stat {
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .statValue {
-  display: block;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: #1f2937;
+  font-family: "Monaco", "Menlo", monospace;
 }
 
 .statLabel {
-  display: block;
-  font-size: 12px;
+  font-size: 10px;
   color: #6b7280;
-  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
 }
 
 .viewMore {
   margin-top: 16px;
   text-align: center;
+  padding: 0 16px;
 }
 
 .viewMoreButton {
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 12px 24px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   transition: background 0.2s;
+  width: 100%;
 
   &:hover {
     background: #2563eb;
+  }
+}
+
+.error,
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+// Skeleton loading styles
+.skeletonNavButton {
+  width: 80px;
+  height: 32px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeletonItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  gap: 12px;
+}
+
+.skeletonPosition {
+  width: 40px;
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeletonAvatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 50%;
+}
+
+.skeletonUserInfo {
+  flex: 1;
+}
+
+.skeletonUsername {
+  width: 120px;
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeletonStats {
+  display: flex;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.skeletonStat {
+  width: 60px;
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }

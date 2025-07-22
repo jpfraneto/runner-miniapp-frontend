@@ -6,7 +6,7 @@ export const useUpdateWorkout = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: updateWorkout,
+    mutationFn: updateWorkout as any,
     onSuccess: (updatedWorkout: RunningSession) => {
       // Invalidate relevant queries to refetch updated data
       queryClient.invalidateQueries({ queryKey: ['workoutHistory'] });

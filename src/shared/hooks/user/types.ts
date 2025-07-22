@@ -1,4 +1,5 @@
-import { Brand } from "../brands";
+// import { Brand } from "../brands";
+type Brand = any;
 
 export type User = {
   fid: number; // String to match backend

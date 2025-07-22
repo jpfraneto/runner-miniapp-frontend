@@ -1,5 +1,5 @@
 // Dependencies
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import sdk from "@farcaster/frame-sdk";
@@ -10,6 +10,8 @@ import Typography from "@/shared/components/Typography";
 import Button from "@/shared/components/Button";
 import IconButton from "@/shared/components/IconButton";
 import LoaderIndicator from "@/shared/components/LoaderIndicator";
+import ShareRunView from "@/shared/components/ShareRunView";
+import ShareSuccessView from "@/shared/components/ShareSuccessView";
 
 // Hooks
 import { useRunningSessionByCastHash } from "@/shared/hooks/user/useRunningSessionByCastHash";
@@ -18,18 +20,25 @@ import { useRunningSessionByCastHash } from "@/shared/hooks/user/useRunningSessi
 import ShareIcon from "@/shared/assets/icons/share-icon.svg?react";
 import ArrowLeftIcon from "@/shared/assets/icons/go-back-icon.svg?react";
 
+// Types  
+import { RunShareVerificationResponse } from "@/services/user";
+
 // StyleSheet
 import styles from "./RunningSessionDetail.module.scss";
-import { API_URL } from "@/config/api";
 
 interface RunningSessionDetailProps {
   castHash: string;
 }
 
+type ViewState = 'detail' | 'share' | 'shareSuccess';
+
 const RunningSessionDetail: React.FC<RunningSessionDetailProps> = ({
   castHash,
 }) => {
   const navigate = useNavigate();
+  const [currentView, setCurrentView] = useState<ViewState>('detail');
+  const [shareVerificationResult, setShareVerificationResult] = useState<RunShareVerificationResponse | null>(null);
+  
   const {
     data: runningSession,
     isLoading,
@@ -43,15 +52,20 @@ const RunningSessionDetail: React.FC<RunningSessionDetailProps> = ({
 
   // Handle share on Farcaster
   const handleShare = () => {
-    if (!runningSession) return;
+    setCurrentView('share');
+  };
 
-    const shareText = ``;
+  const handleSkipShare = () => {
+    setCurrentView('detail');
+  };
 
-    // Use Farcaster SDK to compose cast
-    sdk.actions.composeCast({
-      text: shareText,
-      embeds: [`${API_URL}/embeds/run/${castHash}`],
-    });
+  const handleShareSuccess = (result: RunShareVerificationResponse) => {
+    setShareVerificationResult(result);
+    setCurrentView('shareSuccess');
+  };
+
+  const handleShareSuccessComplete = () => {
+    setCurrentView('detail');
   };
 
   // Format time
@@ -71,6 +85,26 @@ const RunningSessionDetail: React.FC<RunningSessionDetailProps> = ({
       day: "numeric",
     });
   };
+
+  // Handle different view states
+  if (currentView === 'share' && runningSession) {
+    return (
+      <ShareRunView
+        runData={runningSession}
+        onSkip={handleSkipShare}
+        onSuccess={handleShareSuccess}
+      />
+    );
+  }
+
+  if (currentView === 'shareSuccess' && shareVerificationResult) {
+    return (
+      <ShareSuccessView
+        verificationResult={shareVerificationResult}
+        onContinue={handleShareSuccessComplete}
+      />
+    );
+  }
 
   if (isLoading) {
     return (
@@ -315,7 +349,7 @@ const RunningSessionDetail: React.FC<RunningSessionDetailProps> = ({
               </Typography>
 
               <div className={styles.intervalsList}>
-                {runningSession.intervals.map((interval, index) => (
+                {runningSession.intervals.map((interval: any, index: number) => (
                   <div key={index} className={styles.intervalItem}>
                     <div className={styles.intervalHeader}>
                       <Typography variant="geist" weight="medium" size={14}>

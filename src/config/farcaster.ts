@@ -2,6 +2,6 @@
 
 // export const farcasterConfig = {
 //   rpcUrl: 'https://mainnet.optimism.io',
-//   domain: 'brnd.land',
+//   domain: 'runnercoin.lat',
 //   siweUri: 'https://example.com/login',
 // };

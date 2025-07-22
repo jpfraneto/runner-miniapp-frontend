@@ -11,12 +11,15 @@ interface LoaderIndicatorProps {
 
 const LoaderIndicator: React.FC<LoaderIndicatorProps> = ({
   variant = "default",
-  size = 48,
+  size = 160,
 }) => {
   return (
-    <div className={styles[variant]}>
+    <div
+      className={styles[variant]}
+      style={{ width: "100%", height: `${size}px` }}
+    >
       <div
-        className={styles.loader}
+        className={styles.runnerCharacter}
         style={{ width: `${size}px`, height: `${size}px` }}
       />
     </div>

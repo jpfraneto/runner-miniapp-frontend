@@ -20,7 +20,7 @@ export const useMyVoteHistory = (pageId: number = 1, limit: number = 15) => {
   });
 
   if (!result.isError && result.data) {
-    const votes = result.data.data || {};
+    const votes = (result.data as any).data || {};
 
     if (pageId === 1) {
       votesRef.current = votes;
@@ -30,7 +30,7 @@ export const useMyVoteHistory = (pageId: number = 1, limit: number = 15) => {
         ...votes,
       };
     }
-    countRef.current = result.data.count ?? 0;
+    countRef.current = (result.data as any).count ?? 0;
   }
 
   return {

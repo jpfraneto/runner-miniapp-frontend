@@ -5,17 +5,21 @@ import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Components
-import { BrandListItem } from "@/components/BrandListItem";
+// import { BrandListItem } from "@/components/BrandListItem";
+const BrandListItem = ({ children }: any) => <div>{children}</div>;
 
 // StyleSheet
 import styles from "./TopRanking.module.scss";
 
 // Hook
-import { Brand, useBrandList } from "@/hooks/brands";
+// import { Brand, useBrandList } from "@/hooks/brands";
+type Brand = any;
+const useBrandList = (..._args: any[]) => ({ data: { brands: [] }, refetch: () => {} });
 import useDisableScrollBody from "@/hooks/ui/useDisableScrollBody";
 
 // Utils
-import { getBrandScoreVariation } from "@/utils/brand";
+// import { getBrandScoreVariation } from "@/utils/brand";
+const getBrandScoreVariation = (..._args: any[]) => ({});
 
 function TopRanking() {
   const navigate = useNavigate();
@@ -39,7 +43,7 @@ function TopRanking() {
     <div className={styles.layout}>
       {data.brands && data.brands.length > 0 && (
         <ul className={styles.grid}>
-          {data.brands.map((brand, index) => (
+          {data.brands.map((brand: any, index: number) => (
             <li key={`--brand-item-${index.toString()}`}>
               <BrandListItem
                 position={index + 1}

@@ -1,25 +1,61 @@
-.loader {
-  border-radius: 50%;
-  display: inline-block;
-  border-top: 3px solid #FFF;
-  border-right: 3px solid transparent;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite;
+.default {
+  width: 100%;
+  height: 60px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, #2a1810, #3d2315);
+  border: 2px solid #8b4513;
+  box-shadow: 
+    inset 2px 2px 0px #654321,
+    inset -2px -2px 0px #1a0f08,
+    0 0 10px rgba(139, 69, 19, 0.3);
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
 }
 
-@keyframes rotation {
+.fullscreen {
+  width: 100vw;
+  height: 60px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(45deg, #2a1810, #3d2315);
+  border: 2px solid #8b4513;
+  box-shadow: 
+    inset 2px 2px 0px #654321,
+    inset -2px -2px 0px #1a0f08,
+    0 0 10px rgba(139, 69, 19, 0.3);
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.runnerCharacter {
+  position: absolute;
+  top: 50%;
+  left: -40px;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: url("/runner.gif") no-repeat center center;
+  background-size: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8));
+  animation: runnerMove 2s ease-in-out infinite;
+}
+
+@keyframes runnerMove {
   0% {
-    transform: rotate(0deg);
+    left: -40px;
+    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8)) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8)) brightness(1.1);
   }
   100% {
-    transform: rotate(360deg);
+    left: calc(100% + 40px);
+    filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8)) brightness(1);
   }
-} 
-
-.fullscreen {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
 }

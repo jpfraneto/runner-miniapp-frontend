@@ -1,6 +1,5 @@
 /**
- * BRND Application
- * @author German D. Schneck <german.schneck@gmail.com>
+ * Runnercoin Application
  * @author Jorge Pablo Franetovic <jpfraneto@gmail.com>
  */
 // Dependencies

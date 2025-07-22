@@ -12,8 +12,9 @@
   padding: 20px;
 }
 
-.processingContent,
-.completeContent {
+.verifyingContent,
+.resultContent,
+.errorContent {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 20px;
@@ -80,30 +81,56 @@
   font-weight: 500;
 }
 
-.notificationPrompt {
-  margin-top: 20px;
-  padding: 20px;
-  background: rgba(102, 126, 234, 0.05);
+.runData {
+  background: rgba(34, 197, 94, 0.1);
   border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: left;
 }
 
-.shareActions {
-  margin-top: 30px;
-  
-  .sharePrompt {
-    color: #666;
-    margin-bottom: 20px;
-  }
-  
-  .actionButtons {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
-    
-    .shareButton {
-      width: 100%;
-      max-width: 200px;
-    }
-  }
+.dataTitle {
+  color: #22c55e;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.statLabel {
+  color: #666;
+  font-size: 14px;
+}
+
+.statValue {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.personalBest {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255, 193, 7, 0.2);
+  border-radius: 8px;
+}
+
+.pbText {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.continueButton {
+  width: 100%;
+  margin-top: 20px;
+  min-height: 48px;
 }

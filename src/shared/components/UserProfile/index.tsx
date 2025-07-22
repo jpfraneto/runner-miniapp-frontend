@@ -4,6 +4,7 @@ import RunningSessionComponent from "../RunningSession";
 import styles from "./UserProfile.module.scss";
 import { getUserProfile } from "@/services/user";
 import sdk from "@farcaster/frame-sdk";
+import LoaderIndicator from "../LoaderIndicator";
 
 interface UserProfileProps {
   userId: number;
@@ -148,8 +149,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, onBack }) => {
           </button>
         </div>
         <div className={styles.loadingState}>
-          <div className={styles.loadingSpinner} />
-          <div className={styles.loadingText}>Loading profile...</div>
+          <LoaderIndicator />
         </div>
       </div>
     );
@@ -310,7 +310,10 @@ const UserProfile: React.FC<UserProfileProps> = ({ userId, onBack }) => {
         {workouts.length > 0 ? (
           <div className={styles.workoutsList}>
             {workouts.map((workout) => (
-              <RunningSessionComponent key={workout.id} workout={workout} />
+              <RunningSessionComponent
+                key={workout.castHash}
+                workout={workout}
+              />
             ))}
           </div>
         ) : (

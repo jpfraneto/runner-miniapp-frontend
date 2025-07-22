@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import AppLayout from "@/shared/layouts/AppLayout";
 import WorkoutsFeed from "@/shared/components/WorkoutsFeed";
 import { getUserWorkouts } from "@/services/runnerAPI";
-import { Workout } from "@/shared/types/workout";
 import styles from "./UserPage.module.scss";
+import LoaderIndicator from "@/shared/components/LoaderIndicator";
 
 const UserPage: React.FC = () => {
   const { fid } = useParams<{ fid: string }>();
@@ -21,27 +21,34 @@ const UserPage: React.FC = () => {
   useEffect(() => {
     const fetchUserStats = async () => {
       if (!fid) return;
-      
+
       try {
         setLoading(true);
-        const workouts = await getUserWorkouts(parseInt(fid), 100);
-        
-        if (workouts.length > 0) {
-          const firstWorkout = workouts[0];
-          const totalKm = workouts.reduce((sum, workout) => sum + parseFloat(workout.kilometers), 0);
-          const totalRuns = workouts.length;
-          
+        const response = await getUserWorkouts(parseInt(fid), 100);
+        console.log("THE WORKOUTS HERE ARE:", response);
+
+        if (response.runs.length > 0) {
+          const firstWorkout = response.runs[0];
+          const totalKm = response.runs.reduce(
+            (sum, workout) => sum + workout.distanceMeters / 1000,
+            0
+          );
+          const totalRuns = response.runs.length;
+
           // Calculate average pace
-          const totalMinutes = workouts.reduce((sum, workout) => sum + workout.minutes, 0);
+          const totalMinutes = response.runs.reduce(
+            (sum, workout) => sum + workout.duration,
+            0
+          );
           const avgPaceMinutes = totalMinutes / totalKm;
           const avgPace = `${avgPaceMinutes.toFixed(2)} min/km`;
-          
+
           setUserStats({
-            username: firstWorkout.username,
-            pfpUrl: firstWorkout.pfpUrl,
+            username: firstWorkout.user.username,
+            pfpUrl: firstWorkout.user.pfpUrl,
             totalKm,
             totalRuns,
-            avgPace
+            avgPace,
           });
         }
       } catch (error) {
@@ -69,8 +76,7 @@ const UserPage: React.FC = () => {
       <AppLayout>
         <div className={styles.container}>
           <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <p>Loading profile...</p>
+            <LoaderIndicator />
           </div>
         </div>
       </AppLayout>
@@ -80,10 +86,7 @@ const UserPage: React.FC = () => {
   return (
     <AppLayout>
       <div className={styles.container}>
-        <button
-          onClick={() => navigate(-1)}
-          className={styles.backButton}
-        >
+        <button onClick={() => navigate(-1)} className={styles.backButton}>
           ← Back
         </button>
 
@@ -98,11 +101,15 @@ const UserPage: React.FC = () => {
               <h1 className={styles.username}>{userStats.username}</h1>
               <div className={styles.stats}>
                 <div className={styles.stat}>
-                  <span className={styles.statValue}>{userStats.totalKm.toFixed(1)} km</span>
+                  <span className={styles.statValue}>
+                    {userStats.totalKm.toFixed(1)} km
+                  </span>
                   <span className={styles.statLabel}>total distance</span>
                 </div>
                 <div className={styles.stat}>
-                  <span className={styles.statValue}>{userStats.totalRuns}</span>
+                  <span className={styles.statValue}>
+                    {userStats.totalRuns}
+                  </span>
                   <span className={styles.statLabel}>total runs</span>
                 </div>
                 <div className={styles.stat}>

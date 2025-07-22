@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { getCurrentLeaderboard, getWeeklyLeaderboard } from "@/services/runnerAPI";
+import {
+  getCurrentLeaderboard,
+  getWeeklyLeaderboard,
+} from "@/services/runnerAPI";
 import { Leaderboard } from "@/shared/types/leaderboard";
-import { getCurrentWeekNumber, formatWeekDisplay } from "@/shared/utils/weekCalculation";
+import {
+  getCurrentWeekNumber,
+  formatWeekDisplay,
+} from "@/shared/utils/weekCalculation";
 import { useNavigate } from "react-router-dom";
 import styles from "./WeeklyLeaderboard.module.scss";
 
@@ -16,7 +22,7 @@ const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
   weekNumber,
   year = 2024,
   showHistoricalNavigation = false,
-  maxEntries
+  maxEntries,
 }) => {
   const navigate = useNavigate();
   const [leaderboard, setLeaderboard] = useState<Leaderboard>([]);
@@ -31,14 +37,15 @@ const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
       try {
         setLoading(true);
         setError(null);
-        
+
         let data: Leaderboard;
         if (isCurrentWeek) {
           data = await getCurrentLeaderboard();
         } else {
           data = await getWeeklyLeaderboard(displayWeek, year);
         }
-        
+        console.log("IIIIIIN HERE, THE DATA IS:", data);
+
         setLeaderboard(maxEntries ? data.slice(0, maxEntries) : data);
       } catch (err) {
         console.error("Failed to fetch leaderboard:", err);
@@ -57,25 +64,51 @@ const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
 
   const getRankingColor = (position: number) => {
     switch (position) {
-      case 1: return styles.gold;
-      case 2: return styles.silver;
-      case 3: return styles.bronze;
-      default: return "";
+      case 1:
+        return styles.gold;
+      case 2:
+        return styles.silver;
+      case 3:
+        return styles.bronze;
+      default:
+        return "";
     }
   };
 
-  if (loading) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h2>{formatWeekDisplay(displayWeek)} Leaderboard</h2>
-        </div>
-        <div className={styles.loading}>
-          <div className={styles.spinner}></div>
-          <p>Loading leaderboard...</p>
-        </div>
+  const renderSkeletonLoading = () => (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h2>{formatWeekDisplay(displayWeek)} Leaderboard</h2>
       </div>
-    );
+
+      {showHistoricalNavigation && (
+        <div className={styles.navigation}>
+          <div className={styles.skeletonNavButton}></div>
+          <div className={styles.skeletonNavButton}></div>
+          <div className={styles.skeletonNavButton}></div>
+        </div>
+      )}
+
+      <div className={styles.leaderboardList}>
+        {[...Array(6)].map((_, index) => (
+          <div key={index} className={styles.skeletonItem}>
+            <div className={styles.skeletonPosition}></div>
+            <div className={styles.skeletonAvatar}></div>
+            <div className={styles.skeletonUserInfo}>
+              <div className={styles.skeletonUsername}></div>
+            </div>
+            <div className={styles.skeletonStats}>
+              <div className={styles.skeletonStat}></div>
+              <div className={styles.skeletonStat}></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (loading) {
+    return renderSkeletonLoading();
   }
 
   if (error) {
@@ -95,15 +128,15 @@ const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <h2>{formatWeekDisplay(displayWeek)} Leaderboard</h2>
-        {isCurrentWeek && (
-          <span className={styles.liveBadge}>LIVE</span>
-        )}
+        {isCurrentWeek && <span className={styles.liveBadge}>LIVE</span>}
       </div>
 
       {showHistoricalNavigation && (
         <div className={styles.navigation}>
           <button
-            onClick={() => navigate(`/leaderboard?week=${displayWeek - 1}&year=${year}`)}
+            onClick={() =>
+              navigate(`/leaderboard?week=${displayWeek - 1}&year=${year}`)
+            }
             disabled={displayWeek <= 0}
             className={styles.navButton}
           >
@@ -117,7 +150,9 @@ const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
             Current Week
           </button>
           <button
-            onClick={() => navigate(`/leaderboard?week=${displayWeek + 1}&year=${year}`)}
+            onClick={() =>
+              navigate(`/leaderboard?week=${displayWeek + 1}&year=${year}`)
+            }
             disabled={displayWeek >= currentWeek}
             className={styles.navButton}
           >
@@ -135,15 +170,23 @@ const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
           leaderboard.map((entry) => (
             <div
               key={entry.fid}
-              className={`${styles.leaderboardItem} ${getRankingColor(entry.position)}`}
+              className={`${styles.leaderboardItem} ${getRankingColor(
+                entry.position
+              )}`}
               onClick={() => handleUserClick(entry.fid)}
             >
               <div className={styles.position}>
                 <span className={styles.rank}>#{entry.position}</span>
               </div>
-              
+
+              <div className={styles.avatar}>
+                <div className={styles.avatarPlaceholder}>
+                  {entry.username.charAt(0).toUpperCase()}
+                </div>
+              </div>
+
               <div className={styles.userInfo}>
-                <div className={styles.username}>{entry.username}</div>
+                <div className={styles.username}>@{entry.username}</div>
               </div>
 
               <div className={styles.stats}>
@@ -165,7 +208,7 @@ const WeeklyLeaderboard: React.FC<WeeklyLeaderboardProps> = ({
       {maxEntries && leaderboard.length >= maxEntries && (
         <div className={styles.viewMore}>
           <button
-            onClick={() => navigate('/leaderboard')}
+            onClick={() => navigate("/leaderboard")}
             className={styles.viewMoreButton}
           >
             View Full Leaderboard

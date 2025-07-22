@@ -1,4 +1,5 @@
-import { Brand } from "../../hooks/brands";
+// import { Brand } from "../../hooks/brands";
+type Brand = any;
 
 /**
  * Enum representing the different types of modal identifiers.

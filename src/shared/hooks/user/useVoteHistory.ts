@@ -22,7 +22,7 @@ export const useVoteHistory = (userId: User["fid"], pageId: number) => {
   });
 
   if (!result.isError) {
-    const votes = result.data?.data || {};
+    const votes = (result.data as any)?.data || {};
 
     if (pageId === 1) {
       votesRef.current = votes;
@@ -32,7 +32,7 @@ export const useVoteHistory = (userId: User["fid"], pageId: number) => {
         ...votes,
       };
     }
-    countRef.current = result.data?.count ?? 0;
+    countRef.current = (result.data as any)?.count ?? 0;
   }
 
   return {

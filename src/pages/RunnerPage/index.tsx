@@ -256,28 +256,48 @@ const RunnerPage: React.FC = () => {
               {/* Stats as Large Numbers */}
               <div className={styles.statsGrid}>
                 <div className={styles.statItem}>
-                  <svg className={styles.statIcon} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3 12h18l-9-9v18z"/>
+                  <svg
+                    className={styles.statIcon}
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M3 12h18l-9-9v18z" />
                   </svg>
-                  <div className={styles.statNumber}>
-                    {totalDistance}
-                  </div>
+                  <div className={styles.statNumber}>{totalDistance}</div>
                 </div>
                 <div className={styles.statItem}>
-                  <svg className={styles.statIcon} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M9 12l2 2 4-4"/>
-                    <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/>
-                    <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"/>
-                    <path d="M3 12h6m6 0h6"/>
+                  <svg
+                    className={styles.statIcon}
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M9 12l2 2 4-4" />
+                    <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3" />
+                    <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3" />
+                    <path d="M3 12h6m6 0h6" />
                   </svg>
-                  <div className={styles.statNumber}>
-                    {totalRuns}
-                  </div>
+                  <div className={styles.statNumber}>{totalRuns}</div>
                 </div>
                 <div className={styles.statItem}>
-                  <svg className={styles.statIcon} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <polyline points="12,6 12,12 16,14"/>
+                  <svg
+                    className={styles.statIcon}
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12,6 12,12 16,14" />
                   </svg>
                   <div className={styles.statNumber}>
                     {Math.floor(totalTimeMinutes / 60)}
@@ -294,7 +314,7 @@ const RunnerPage: React.FC = () => {
           {workouts && workouts.length > 0 ? (
             <div className={styles.runsList}>
               {workouts.map((run: RunningSessionType) => (
-                <RunningSessionComponent key={run.id} workout={run} />
+                <RunningSessionComponent key={run.castHash} workout={run} />
               ))}
             </div>
           ) : (
