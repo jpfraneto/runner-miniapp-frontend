@@ -208,7 +208,7 @@ const ProgressPage: React.FC = () => {
   };
 
   const generateShareText = () => {
-    return `🏃‍♂️ My RunnerCoin Journey:\n\n📊 ${mockData.totalRuns} runs • ${
+    return `🏃‍♂️ My $runner Journey:\n\n📊 ${mockData.totalRuns} runs • ${
       mockData.totalDistance
     }km • ${formatTime(mockData.totalTime)}\n🔥 ${
       mockData.currentStreak

@@ -119,7 +119,7 @@ const WorkoutSummary: React.FC<WorkoutSummaryProps> = ({
             Screenshots ({screenshotUrls.length})
           </Typography>
           <div className={styles.screenshotsGrid}>
-            {screenshotUrls.slice(0, 3).map((url, index) => (
+            {screenshotUrls.slice(0, 3).map((url: string, index: number) => (
               <div key={index} className={styles.screenshotItem}>
                 <img
                   src={url}

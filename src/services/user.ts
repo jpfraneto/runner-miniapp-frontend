@@ -11,11 +11,8 @@ import {
 
 // Types
 import { User, UserVote } from "../shared/hooks/user";
-import { TodaysMissionData } from "@/shared/hooks/user/useTodaysMission";
 import { RunningSession } from "@/shared/types/running";
 
-// Type for today's mission API response
-export type TodaysMissionResponse = TodaysMissionData;
 // Types for run detail
 export interface RunDetailResponse {
   success: boolean;
@@ -47,6 +44,38 @@ export interface RunShareVerificationResponse {
   message: string;
   alreadyShared?: boolean;
 }
+
+// Error types for running session submission
+export interface ErrorResponse {
+  success: false;
+  processed: false;
+  error: {
+    type: 'DAILY_LIMIT_REACHED' | 'USER_NOT_FOUND' | 'DUPLICATE_SESSION' | 'PROCESSING_ERROR';
+    message: string;
+    code: string;
+    statusCode: number;
+  };
+  castHash?: string;
+}
+
+export interface SuccessResponse {
+  success: boolean;
+  verified: boolean;
+  processed?: boolean;
+  isWorkoutImage: boolean;
+  replyData?: {
+    castHash: string;
+    text: string;
+    message: string;
+  };
+  run?: {
+    distanceMeters?: number;
+    duration?: number;
+  };
+  message: string;
+}
+
+export type CastVerificationResponse = SuccessResponse | ErrorResponse;
 
 /**
  * Get current authenticated user info
@@ -223,7 +252,7 @@ export const getUserProfile = async (fid: number) =>
  * @returns Promise with running session data including user details and intervals
  */
 export const getRunningSessionByCastHash = async (castHash: string) =>
-  await request<RunningSession>(`${TRAINING_SERVICE}/runs/${castHash}`, {
+  await request<RunningSession>(`${TRAINING_SERVICE}/run/${castHash}`, {
     method: "GET",
   });
 
@@ -252,28 +281,14 @@ export const verifyRunShare = async (
  * This is the main function called when a user creates a cast from the navigation bar.
  *
  * @param data - Object containing castHash, text, and embeds
- * @returns A promise that resolves with processing result
+ * @returns A promise that resolves with processing result or error details
  */
 export const verifyAndProcessCast = async (data: {
   castHash: string;
   text?: string;
   embeds?: string[];
-}): Promise<{
-  success: boolean;
-  verified: boolean;
-  isWorkoutImage: boolean;
-  replyData?: {
-    castHash: string;
-    text: string;
-    message: string;
-  };
-  run?: {
-    distanceMeters?: number;
-    duration?: number;
-  };
-  message: string;
-}> =>
-  await request(`${TRAINING_SERVICE}/verify-and-process-cast`, {
+}): Promise<CastVerificationResponse> =>
+  await request<CastVerificationResponse>(`${TRAINING_SERVICE}/verify-and-process-cast`, {
     method: "POST",
     body: data,
     headers: {
@@ -282,13 +297,17 @@ export const verifyAndProcessCast = async (data: {
   });
 
 // Stub functions for missing exports
-export const markSessionCompleted = async (..._args: any[]) => Promise.resolve({ success: true, message: 'stub' });
-export const getMyVoteHistory = async (..._args: any[]) => Promise.resolve({ data: [], count: 0 });
-export const updateWorkout = async (..._args: any[]) => Promise.resolve({
-  fid: 0,
-  distanceMeters: 0,
-  duration: 0,
-  castHash: '',
-  user: { fid: 0, username: '', pfpUrl: '' }
-});
-export const getUserVotesHistory = async (..._args: any[]) => Promise.resolve({ data: [], count: 0 });
+export const markSessionCompleted = async (..._args: any[]) =>
+  Promise.resolve({ success: true, message: "stub" });
+export const getMyVoteHistory = async (..._args: any[]) =>
+  Promise.resolve({ data: [], count: 0 });
+export const updateWorkout = async (..._args: any[]) =>
+  Promise.resolve({
+    fid: 0,
+    distanceMeters: 0,
+    duration: 0,
+    castHash: "",
+    user: { fid: 0, username: "", pfpUrl: "" },
+  });
+export const getUserVotesHistory = async (..._args: any[]) =>
+  Promise.resolve({ data: [], count: 0 });

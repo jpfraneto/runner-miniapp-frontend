@@ -1,8 +1,10 @@
 @import "../../shared/styles/index.scss";
 
 .container {
-  max-width: 800px;
-  margin: 0 auto;
+  height: 100vh;
+  padding-bottom: 80px;
+  background: linear-gradient(180deg, #2a1810 0%, #1a0f08 100%);
+  overflow-y: auto;
 }
 
 .content {
@@ -10,12 +12,10 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 .header {
   text-align: center;
-  padding: 20px 0;
   border-bottom: 3px solid #654321;
 }
 
@@ -347,8 +347,8 @@
 }
 
 .userAvatar {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #ffcc00;

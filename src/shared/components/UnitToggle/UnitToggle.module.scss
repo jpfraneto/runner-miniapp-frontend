@@ -1,0 +1,41 @@
+.unitsToggle {
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  border: 3px solid #cc3600;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  font-weight: bold;
+  color: #ffffff;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 4px 0px #cc3600,
+    0 6px 8px rgba(0, 0, 0, 0.4);
+  transition: all 0.1s ease;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+
+  &:hover {
+    background: linear-gradient(135deg, #ff7f50, #ff5722);
+    transform: translateY(1px);
+    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+      inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 3px 0px #cc3600,
+      0 5px 6px rgba(0, 0, 0, 0.4);
+  }
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
+      inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 2px 0px #cc3600,
+      0 3px 4px rgba(0, 0, 0, 0.4);
+  }
+}
+
+@media (max-width: 768px) {
+  .unitsToggle {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

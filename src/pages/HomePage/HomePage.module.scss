@@ -1,14 +1,14 @@
 @import "@/styles/index.scss";
 
 .container {
-  width: 100%;
+  width: 100vw;
   margin: 0 auto;
   padding: 0;
   display: flex;
   flex-direction: column;
   gap: 0;
   background: linear-gradient(135deg, #8b4513, #654321);
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .header {
@@ -23,68 +23,33 @@
   z-index: 100;
 }
 
-.unitsToggle {
-  background: linear-gradient(135deg, #ff6b35, #ff4500);
-  border: 3px solid #cc3600;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-family: "Courier New", monospace;
-  font-size: 14px;
-  font-weight: bold;
-  color: #ffffff;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-    inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 4px 0px #cc3600,
-    0 6px 8px rgba(0, 0, 0, 0.4);
-  transition: all 0.1s ease;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
 
-  &:hover {
-    background: linear-gradient(135deg, #ff7f50, #ff5722);
-    transform: translateY(1px);
-    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-      inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 3px 0px #cc3600,
-      0 5px 6px rgba(0, 0, 0, 0.4);
-  }
-
-  &:active {
-    transform: translateY(2px);
-    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-      inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 2px 0px #cc3600,
-      0 3px 4px rgba(0, 0, 0, 0.4);
-  }
+.profileButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .profileButton {
-  background: linear-gradient(135deg, #4a90e2, #357abd);
-  border: 3px solid #2e5a87;
   border-radius: 50%;
   padding: 4px;
   cursor: pointer;
-  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-    inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 4px 0px #2e5a87,
-    0 6px 8px rgba(0, 0, 0, 0.4);
   transition: all 0.1s ease;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffcc00;
+  font-size: 18px;
 
   &:hover {
-    background: linear-gradient(135deg, #5ba0f2, #4a90e2);
-    transform: translateY(1px);
-    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-      inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 3px 0px #2e5a87,
-      0 5px 6px rgba(0, 0, 0, 0.4);
+    transform: scale(1.1);
+    color: #ffdd33;
   }
 
   &:active {
-    transform: translateY(2px);
-    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.3),
-      inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 2px 0px #2e5a87,
-      0 3px 4px rgba(0, 0, 0, 0.4);
+    transform: scale(0.95);
   }
 }
 
@@ -93,16 +58,6 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #ffffff;
-  image-rendering: pixelated;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: crisp-edges;
-}
-
-.feedContainer {
-  flex: 1;
-  padding: 20px;
-  background: linear-gradient(135deg, #8b4513, #654321);
 }
 
 .weeklyStats {
@@ -169,10 +124,6 @@
     padding: 12px 16px;
   }
 
-  .feedContainer {
-    padding: 16px;
-  }
-
   .weeklyStats {
     padding: 16px;
     gap: 16px;
@@ -182,13 +133,168 @@
     font-size: 20px;
   }
 
-  .unitsToggle {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
   .profileImage {
     width: 36px;
     height: 36px;
+  }
+}
+
+// Modal Styles
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: linear-gradient(135deg, #2a1810, #1a0f08);
+  border: 3px solid #8b4513;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.1),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.6);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid #654321;
+  background: linear-gradient(135deg, #3d2315, #2a1810);
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffcc00;
+    font-family: "Courier New", monospace;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #cccccc;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #ffcc00;
+    background: rgba(255, 204, 0, 0.1);
+  }
+}
+
+.modalContent {
+  padding: 24px;
+}
+
+.rewardInfo {
+  text-align: center;
+
+  .rewardIcon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffcc00;
+    font-family: "Courier New", monospace;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  }
+
+  p {
+    margin: 0 0 24px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #cccccc;
+    font-family: "Courier New", monospace;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.rewardBreakdown {
+  background: linear-gradient(135deg, #1a0f08, #2a1810);
+  border: 2px solid #654321;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.05),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3);
+}
+
+.rewardItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #654321;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .rank {
+    font-size: 14px;
+    font-weight: bold;
+    color: #ffcc00;
+    font-family: "Courier New", monospace;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  }
+
+  .percentage {
+    font-size: 14px;
+    font-weight: bold;
+    color: #4a90e2;
+    font-family: "Courier New", monospace;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.totalReward {
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  border: 2px solid #cc3600;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3);
+
+  strong {
+    color: #ffffff;
+    font-family: "Courier New", monospace;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+    font-size: 14px;
   }
 }

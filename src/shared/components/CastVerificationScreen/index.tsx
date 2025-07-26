@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import sdk from "@farcaster/frame-sdk";
 
 // Components
 import Typography from "@/shared/components/Typography";
@@ -8,6 +9,13 @@ import Button from "@/shared/components/Button";
 
 // Styles
 import styles from "./CastVerificationScreen.module.scss";
+import { useState } from "react";
+
+// Error handling
+import {
+  UserFriendlyError,
+  formatTimeUntilNextDay,
+} from "@/shared/utils/errorHandling";
 
 interface CastVerificationScreenProps {
   castHash: string;
@@ -15,6 +23,7 @@ interface CastVerificationScreenProps {
   embeds: string[];
   isVerifying: boolean;
   verificationResult: any;
+  submissionError: UserFriendlyError | null;
   onComplete: () => void;
 }
 
@@ -24,15 +33,64 @@ const CastVerificationScreen: React.FC<CastVerificationScreenProps> = ({
   embeds,
   isVerifying,
   verificationResult,
+  submissionError,
   onComplete,
 }) => {
   console.log(JSON.stringify(verificationResult, null, 2));
   const navigate = useNavigate();
+  const [timeUntilReset, setTimeUntilReset] = useState<string>("");
 
   const handleContinue = () => {
+    sdk.haptics.impactOccurred("medium");
     onComplete();
     navigate("/");
   };
+
+  const handleActionClick = () => {
+    if (submissionError?.action) {
+      sdk.haptics.impactOccurred("light");
+      submissionError.action();
+    }
+  };
+
+  const handleSecondaryActionClick = () => {
+    if (submissionError?.secondaryAction) {
+      sdk.haptics.impactOccurred("light");
+      submissionError.secondaryAction();
+    }
+  };
+
+  // Haptic feedback when verification starts
+  useEffect(() => {
+    if (isVerifying) {
+      sdk.haptics.impactOccurred("light");
+    }
+  }, [isVerifying]);
+
+  // Haptic feedback when verification completes
+  useEffect(() => {
+    if (!isVerifying && verificationResult) {
+      if (verificationResult.verified && verificationResult.processed) {
+        sdk.haptics.notificationOccurred("success");
+      } else {
+        sdk.haptics.notificationOccurred("error");
+      }
+    }
+  }, [isVerifying, verificationResult]);
+
+  // Timer for daily limit countdown
+  useEffect(() => {
+    if (submissionError?.showTimer) {
+      const updateTimer = () => {
+        setTimeUntilReset(formatTimeUntilNextDay());
+      };
+
+      updateTimer(); // Initial update
+      const interval = setInterval(updateTimer, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [submissionError]);
 
   return (
     <div className={styles.container}>
@@ -78,6 +136,68 @@ const CastVerificationScreen: React.FC<CastVerificationScreenProps> = ({
             <Typography size={14} className={styles.loadingText}>
               Analyzing cast for running data...
             </Typography>
+          </div>
+        </div>
+      ) : submissionError ? (
+        <div className={styles.errorContent}>
+          <div className={styles.icon}>
+            {submissionError.type === "warning"
+              ? "⚠️"
+              : submissionError.type === "info"
+              ? "ℹ️"
+              : "❌"}
+          </div>
+
+          <Typography
+            variant="druk"
+            weight="wide"
+            size={24}
+            className={styles.title}
+          >
+            {submissionError.title}
+          </Typography>
+
+          <Typography size={16} className={styles.description}>
+            {submissionError.message}
+          </Typography>
+
+          {submissionError.showTimer && timeUntilReset && (
+            <div className={styles.timerContainer}>
+              <Typography size={14} className={styles.timerLabel}>
+                {submissionError.timerMessage || "Try again in:"}
+              </Typography>
+              <Typography size={18} className={styles.timerValue}>
+                {timeUntilReset}
+              </Typography>
+            </div>
+          )}
+
+          <div className={styles.buttonContainer}>
+            {submissionError.actionText && submissionError.action && (
+              <Button
+                variant="primary"
+                caption={submissionError.actionText}
+                onClick={handleActionClick}
+                className={styles.actionButton}
+              />
+            )}
+
+            {submissionError.secondaryActionText &&
+              submissionError.secondaryAction && (
+                <Button
+                  variant="secondary"
+                  caption={submissionError.secondaryActionText}
+                  onClick={handleSecondaryActionClick}
+                  className={styles.secondaryButton}
+                />
+              )}
+
+            <Button
+              variant="primary"
+              caption="Continue"
+              onClick={handleContinue}
+              className={styles.continueButton}
+            />
           </div>
         </div>
       ) : verificationResult ? (

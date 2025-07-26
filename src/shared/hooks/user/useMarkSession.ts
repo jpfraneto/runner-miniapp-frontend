@@ -20,11 +20,13 @@ export const useMarkSession = () => {
 
   return useMutation({
     mutationFn: ({ sessionId, didComplete }: MarkSessionData) =>
-      markSessionCompleted(sessionId, didComplete) as Promise<MarkSessionResponse>,
+      markSessionCompleted(
+        sessionId,
+        didComplete
+      ) as Promise<MarkSessionResponse>,
 
     onSuccess: (_data: MarkSessionResponse, variables) => {
       // Invalidate relevant queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["todaysMission"] });
       queryClient.invalidateQueries({ queryKey: ["userStats"] });
       queryClient.invalidateQueries({ queryKey: ["weeklyProgress"] });
 

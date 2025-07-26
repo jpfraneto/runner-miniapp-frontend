@@ -7,12 +7,27 @@
   "frame": {
     "version": "1",
     "name": "$RUNNER",
-    "iconUrl": "https://github.com/jpfraneto/images/blob/main/icoonnn.png?raw=true",
+    "iconUrl": "https://github.com/jpfraneto/images/blob/main/RUNNER_ICON_88.jpeg?raw=true",
     "homeUrl": "https://runnercoin.lat",
     "imageUrl": "https://github.com/jpfraneto/images/blob/main/runnerimage.png?raw=true",
     "buttonTitle": "Start Running",
     "splashImageUrl": "https://github.com/jpfraneto/images/blob/main/2_animation.gif?raw=true",
-    "splashBackgroundColor": "#000000",
-    "webhookUrl": "https://api.runnercoin.lat/notification-service/webhook"
+    "splashBackgroundColor": "#32180A",
+    "webhookUrl": "https://api.neynar.com/f/app/1cf97c91-169c-4071-9852-dc57cfd9578a/event",
+
+    "subtitle": "Run and Earn",
+    "description": "Log your runs and earn RUNNER tokens by being part of the weekly top 8.",
+    "screenshotUrls": [
+      "https://github.com/jpfraneto/images/blob/main/RUNNER_SCREENSHOT_1.PNG?raw=true",
+      "https://github.com/jpfraneto/images/blob/main/RUNNER_SCREENSHOT_2.PNG?raw=true",
+      "https://github.com/jpfraneto/images/blob/main/RUNNER_SCREENSHOT_3.PNG?raw=true"
+    ],
+    "primaryCategory": "health-fitness",
+    "tags": ["running", "fitness", "tracker", "leaderboard", "runner"],
+    "heroImageUrl": "https://github.com/jpfraneto/images/blob/main/RUNNER_HERO_IMAGE.png?raw=true",
+    "tagline": "Run and Earn",
+    "ogTitle": "runner miniapp",
+    "ogDescription": "Log your runs and earn RUNNER tokens by being part of the weekly top 8",
+    "ogImageUrl": "https://github.com/jpfraneto/images/blob/main/runnerimage.png?raw=true"
   }
 }

@@ -9,8 +9,6 @@ import WorkoutFeed from "@/shared/components/WorkoutFeed";
 import styles from "./MiniAppPage.module.scss";
 
 const MiniAppPage: React.FC = () => {
-  // const { todaysMission } = useContext(AuthContext);
-
   return (
     <AppLayout>
       <div className={styles.container}>

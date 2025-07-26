@@ -9,6 +9,7 @@ export enum ModalsIds {
   BOTTOM_ALERT = "BOTTOM_ALERT",
   SHARE_BRAND = "SHARE_BRAND",
   WORKOUT_IMAGE_SELECTION = "WORKOUT_IMAGE_SELECTION",
+  DATABASE_RESET_CONFIRM = "DATABASE_RESET_CONFIRM",
 }
 
 /**
@@ -19,6 +20,7 @@ export type ModalData = {
   [ModalsIds.BOTTOM_ALERT]: BottomAlertData;
   [ModalsIds.SHARE_BRAND]: ShareBrandModalData;
   [ModalsIds.WORKOUT_IMAGE_SELECTION]: WorkoutImageSelectionData;
+  [ModalsIds.DATABASE_RESET_CONFIRM]: DatabaseResetConfirmModalData;
 };
 
 /**
@@ -84,4 +86,13 @@ export type WorkoutImageSelectionData = {
   title: string;
   message: string;
   onImageSelect: (files: File[]) => void;
+};
+
+/**
+ * Type representing the data structure for database reset confirmation modal.
+ */
+export type DatabaseResetConfirmModalData = {
+  title: string;
+  message: string;
+  onConfirm: () => void;
 };

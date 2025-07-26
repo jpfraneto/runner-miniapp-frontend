@@ -86,7 +86,7 @@ const WorkoutHistory: React.FC = () => {
           <div
             key={workout.id}
             className={styles.workoutItem}
-            onClick={() => navigate(`/runs/${workout.id}`)}
+            onClick={() => navigate(`/run/${workout.id}`)}
           >
             <div className={styles.workoutInfo}>
               <Typography
@@ -106,7 +106,7 @@ const WorkoutHistory: React.FC = () => {
                   size={12}
                   className={styles.stat}
                 >
-                  {Number(workout.distance)} {workout.units}
+                  {Number(workout.distanceMeters / 1000)} km
                 </Typography>
                 <Typography
                   variant="geist"
@@ -116,28 +116,8 @@ const WorkoutHistory: React.FC = () => {
                 >
                   {Number(workout.duration)} min
                 </Typography>
-                <Typography
-                  variant="geist"
-                  weight="regular"
-                  size={12}
-                  className={styles.stat}
-                >
-                  {workout.pace}
-                </Typography>
               </div>
             </div>
-            {workout.isPersonalBest && (
-              <div className={styles.personalBest}>
-                <Typography
-                  variant="geist"
-                  weight="medium"
-                  size={10}
-                  className={styles.pbText}
-                >
-                  PB
-                </Typography>
-              </div>
-            )}
           </div>
         ))}
       </div>

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import AppLayout from "@/shared/layouts/AppLayout";
 import { AuthContext } from "@/shared/providers/AppProvider";
 import { RunningSession } from "@/shared/types/running";
 import { RunningSession as RunningSessionType } from "@/shared/types/running";
 import RunningSessionComponent from "@/shared/components/RunningSession";
 import { getUserProfile } from "@/services/user";
+import { useSmartNavigation } from "@/shared/hooks/navigation/useSmartNavigation";
 import sdk from "@farcaster/frame-sdk";
 import styles from "./RunnerPage.module.scss";
 import { API_URL } from "@/config/api";
@@ -81,7 +82,7 @@ function useUserProfile(fid: number) {
 
 const RunnerPage: React.FC = () => {
   const { fid } = useParams();
-  const navigate = useNavigate();
+  const { goBack } = useSmartNavigation();
   const { miniappContext } = useContext(AuthContext);
 
   const { profileData, isLoading, error } = useUserProfile(Number(fid));
@@ -195,7 +196,7 @@ const RunnerPage: React.FC = () => {
             {canGoBack && (
               <button
                 className={styles.backButton}
-                onClick={() => navigate(-1)}
+                onClick={goBack}
                 aria-label="Go back"
               >
                 <svg
@@ -214,10 +215,6 @@ const RunnerPage: React.FC = () => {
             <button
               className={styles.shareButton}
               onClick={() => {
-                console.log(
-                  "JUST BEFORE COMPOSING THE CAST",
-                  `${API_URL}/embeds/user/${fid}`
-                );
                 sdk.actions.composeCast({
                   text: generateShareText(),
                   embeds: [`${API_URL}/embeds/user/${fid}`],

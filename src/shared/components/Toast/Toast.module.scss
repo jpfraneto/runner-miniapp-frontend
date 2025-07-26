@@ -1,0 +1,137 @@
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  max-width: 400px;
+  min-width: 300px;
+  padding: 16px;
+  border-radius: 8px;
+  border: 3px solid;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.1),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.4);
+  animation: slideIn 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &.success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-color: #15803d;
+    color: #ffffff;
+  }
+
+  &.error {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: #b91c1c;
+    color: #ffffff;
+  }
+
+  &.warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-color: #b45309;
+    color: #ffffff;
+  }
+
+  &.info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border-color: #1d4ed8;
+    color: #ffffff;
+  }
+
+  &.fadeOut {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.message {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  &:active {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  .toast {
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    max-width: none;
+    min-width: auto;
+  }
+
+  .message {
+    font-size: 13px;
+  }
+
+  .icon {
+    font-size: 18px;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  &.fadeOut {
+    transform: translateY(-100%);
+  }
+}

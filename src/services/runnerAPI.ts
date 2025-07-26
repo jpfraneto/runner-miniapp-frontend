@@ -41,14 +41,12 @@ export const getCurrentLeaderboard = async (): Promise<Leaderboard> =>
   });
 
 export const getWeeklyLeaderboard = async (
-  weekNumber: number = 0,
-  year: number = 2024
+  weekNumber: number = 0
 ): Promise<Leaderboard> =>
   await request<Leaderboard>(`${LEADERBOARD_SERVICE}/week`, {
     method: "GET",
     params: {
       weekNumber: String(weekNumber),
-      year: String(year),
     },
   });
 

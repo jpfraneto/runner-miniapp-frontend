@@ -6,8 +6,8 @@ import NotFoundPage from "../pages/NotFoundPage";
 import HomePage from "../pages/HomePage";
 import RunningSessionPage from "../pages/RunningSessionPage";
 import LeaderboardPage from "@/pages/LeaderboardPage";
-import ActivityPage from "@/pages/ActivityPage";
 import UserPage from "@/pages/UserPage";
+import AdminAutomationPage from "@/pages/AdminAutomationPage";
 
 // Providers
 import { AppProvider } from "../shared/providers/AppProvider";
@@ -24,10 +24,10 @@ export const router = createBrowserRouter([
         path: "/",
         element: <HomePage />,
       },
-      { path: "/runs/:castHash", element: <RunningSessionPage /> },
+      { path: "/run/:castHash", element: <RunningSessionPage /> },
       { path: "/user/:fid", element: <UserPage /> },
       { path: "/leaderboard", element: <LeaderboardPage /> },
-      { path: "/activity", element: <ActivityPage /> },
+      { path: "/admin/automation", element: <AdminAutomationPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

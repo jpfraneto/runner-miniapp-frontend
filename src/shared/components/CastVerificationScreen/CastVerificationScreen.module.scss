@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #2a1810 0%, #1a0f08 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15,14 +15,16 @@
 .verifyingContent,
 .resultContent,
 .errorContent {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+  background: linear-gradient(135deg, #3d2315, #2a1810);
+  border: 3px solid #654321;
+  border-radius: 12px;
   padding: 40px 30px;
   text-align: center;
   max-width: 400px;
   width: 100%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.1),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.4);
 }
 
 .icon {
@@ -32,41 +34,55 @@
 }
 
 .title {
-  color: #1a1a1a;
+  color: #ffcc00;
   margin-bottom: 16px;
   line-height: 1.2;
+  font-family: "Courier New", monospace;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
+  font-weight: 700;
 }
 
 .description {
-  color: #666;
+  color: #cccccc;
   margin-bottom: 30px;
   line-height: 1.5;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
 }
 
 .castInfo {
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 12px;
+  background: linear-gradient(135deg, #4a2d18, #3d2315);
+  border: 2px solid #654321;
+  border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
   text-align: left;
+  box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.2),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.3);
 }
 
 .castHash {
-  color: #667eea;
-  font-family: "Monaco", "Menlo", monospace;
+  color: #ffcc00;
+  font-family: "Courier New", monospace;
   margin-bottom: 8px;
   word-break: break-all;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
 }
 
 .castText {
-  color: #333;
+  color: #cccccc;
   margin-bottom: 8px;
   font-style: italic;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
 }
 
 .embedsCount {
-  color: #666;
+  color: #cccccc;
   font-size: 12px;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
 }
 
 .loaderContainer {
@@ -77,22 +93,31 @@
 }
 
 .loadingText {
-  color: #667eea;
+  color: #ffcc00;
   font-weight: 500;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
 }
 
 .runData {
-  background: rgba(34, 197, 94, 0.1);
-  border-radius: 12px;
+  background: linear-gradient(135deg, #4a2d18, #3d2315);
+  border: 2px solid #22c55e;
+  border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
   text-align: left;
+  box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.2),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.3);
 }
 
 .dataTitle {
   color: #22c55e;
   font-weight: 600;
   margin-bottom: 12px;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  text-transform: uppercase;
 }
 
 .stats {
@@ -108,13 +133,17 @@
 }
 
 .statLabel {
-  color: #666;
+  color: #cccccc;
   font-size: 14px;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
 }
 
 .statValue {
-  color: #1a1a1a;
+  color: #ffcc00;
   font-weight: 500;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
 }
 
 .personalBest {
@@ -129,8 +158,126 @@
   font-weight: 600;
 }
 
+.timerContainer {
+  background: linear-gradient(135deg, #4a2d18, #3d2315);
+  border: 2px solid #ffcc00;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+  text-align: center;
+  box-shadow: inset 1px 1px 0px rgba(255, 255, 255, 0.2),
+    inset -1px -1px 0px rgba(0, 0, 0, 0.3);
+}
+
+.timerLabel {
+  color: #cccccc;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.timerValue {
+  color: #ffcc00;
+  font-family: "Courier New", monospace;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.actionButton,
+.secondaryButton {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 24px;
+  border: 3px solid #654321;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.actionButton {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-color: #16a34a;
+  color: #ffffff;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 3px 0 #15803d;
+
+  &:hover {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    transform: translateY(1px);
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+      inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 2px 0 #15803d;
+  }
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+      inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 1px 0 #15803d;
+  }
+}
+
+.secondaryButton {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  border-color: #4b5563;
+  color: #ffffff;
+  box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 3px 0 #374151;
+
+  &:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    transform: translateY(1px);
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+      inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 2px 0 #374151;
+  }
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.2),
+      inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 1px 0 #374151;
+  }
+}
+
 .continueButton {
   width: 100%;
-  margin-top: 20px;
   min-height: 48px;
+  padding: 12px 24px;
+  border: 3px solid #654321;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4a2d18, #3d2315);
+  color: #ffcc00;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+  box-shadow: inset 2px 2px 0 rgba(255, 204, 0, 0.2),
+    inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 3px 0 #2a1810;
+
+  &:hover {
+    background: linear-gradient(135deg, #5d3520, #4a2d18);
+    transform: translateY(1px);
+    box-shadow: inset 2px 2px 0 rgba(255, 204, 0, 0.2),
+      inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 2px 0 #2a1810;
+  }
+
+  &:active {
+    transform: translateY(2px);
+    box-shadow: inset 2px 2px 0 rgba(255, 204, 0, 0.2),
+      inset -2px -2px 0 rgba(0, 0, 0, 0.5), 0 1px 0 #2a1810;
+  }
 }

@@ -18,6 +18,7 @@ import ShareIcon from "@/shared/assets/icons/share-icon.svg?react";
 
 // StyleSheet
 import styles from "./ShareRunView.module.scss";
+import { API_URL } from "@/config/api";
 
 interface ShareRunViewProps {
   runData: RunningSession;
@@ -63,21 +64,15 @@ export default function ShareRunView({
     setShareError(null);
 
     try {
-      const distance = (runData as any).distance || runData.distanceMeters / 1000;
-      const pace = calculatePace(distance, runData.duration);
+      const distance =
+        (runData as any).distance || runData.distanceMeters / 1000;
 
-      // Create the cast text
-      const castText = `Just crushed a ${distance.toFixed(1)}km run! 🏃‍♂️
-
-⏱️ Time: ${formatDuration(runData.duration)}
-⚡ Pace: ${pace}/km
-
-Building my fitness streak one run at a time! 💪
-
-#RunnerCoin #fitness #running`;
+      const castText = `Just ran ${distance.toFixed(1)}kms on ${
+        runData.duration
+      }`;
 
       // Use the app's embed URL - you might want to customize this
-      const embedUrl = `https://runnercoin.lat/runs/${runData.castHash}`;
+      const embedUrl = `${API_URL}/embeds/run/${runData.castHash}`;
 
       // Compose cast with standardized text and embed
       const castResponse = await sdk.actions.composeCast({
@@ -101,7 +96,7 @@ Building my fitness streak one run at a time! 💪
             onSuccess: (data) => {
               setIsVerifying(false);
               console.log("✅ Run share verified:", data);
-              
+
               // Call success callback with the verification data or navigate
               if (onSuccess) {
                 onSuccess(data);
@@ -128,14 +123,7 @@ Building my fitness streak one run at a time! 💪
       setShareError("Failed to share cast. Please try again.");
       setIsSharing(false);
     }
-  }, [
-    runData,
-    shareVerification,
-    isSharing,
-    isVerifying,
-    onSuccess,
-    navigate,
-  ]);
+  }, [runData, shareVerification, isSharing, isVerifying, onSuccess, navigate]);
 
   // Determine the current state for UI feedback
   const getButtonState = () => {
@@ -159,7 +147,7 @@ Building my fitness streak one run at a time! 💪
         >
           Share Your Run
         </Typography>
-        
+
         <Typography
           size={16}
           lineHeight={24}
@@ -224,7 +212,7 @@ Building my fitness streak one run at a time! 💪
                 km
               </Typography>
             </div>
-            
+
             <div className={styles.statItem}>
               <Typography
                 variant={"druk"}
@@ -245,7 +233,7 @@ Building my fitness streak one run at a time! 💪
                 time
               </Typography>
             </div>
-            
+
             <div className={styles.statItem}>
               <Typography
                 variant={"druk"}
@@ -279,7 +267,7 @@ Building my fitness streak one run at a time! 💪
           >
             Cast Preview:
           </Typography>
-          
+
           <div className={styles.castPreview}>
             <Typography
               variant={"geist"}
@@ -287,12 +275,15 @@ Building my fitness streak one run at a time! 💪
               size={14}
               lineHeight={20}
             >
-              Just crushed a {distance.toFixed(1)}km run! 🏃‍♂️<br />
+              Just crushed a {distance.toFixed(1)}km run! 🏃‍♂️
               <br />
-              ⏱️ Time: {formatDuration(runData.duration)}<br />
-              ⚡ Pace: {calculatePace(distance, runData.duration)}/km<br />
               <br />
-              Building my fitness streak one run at a time! 💪<br />
+              ⏱️ Time: {formatDuration(runData.duration)}
+              <br />⚡ Pace: {calculatePace(distance, runData.duration)}/km
+              <br />
+              <br />
+              Building my fitness streak one run at a time! 💪
+              <br />
               <br />
               #RunnerCoin #fitness #running
             </Typography>
@@ -312,17 +303,15 @@ Building my fitness streak one run at a time! 💪
               ? "Verifying share to award points..."
               : "Earn points for sharing your achievement!"}
           </Typography>
-          
+
           <Button
             caption={getButtonState()}
             className={styles.shareButton}
-            iconLeft={
-              isLoading ? <LoaderIndicator size={16} /> : <ShareIcon />
-            }
+            iconLeft={isLoading ? <LoaderIndicator size={16} /> : <ShareIcon />}
             onClick={handleClickShare}
             disabled={isLoading}
           />
-          
+
           <Button
             variant={"underline"}
             caption="Skip for now"

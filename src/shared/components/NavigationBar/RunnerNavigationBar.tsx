@@ -5,10 +5,9 @@ import classNames from "clsx";
 // StyleSheet
 import styles from "./RunnerNavigationBar.module.scss";
 
-// SVG Icons
-import HomeIcon from "./icons/HomeIcon";
-import RunningIcon from "./icons/RunningIcon";
-import LeaderboardIcon from "./icons/LeaderboardIcon";
+import { FaHome } from "react-icons/fa";
+import { FaRunning } from "react-icons/fa";
+import { FaTrophy } from "react-icons/fa";
 
 // Components
 import CastVerificationScreen from "@/shared/components/CastVerificationScreen";
@@ -20,6 +19,13 @@ import { useProcessingRuns } from "@/shared/providers/ProcessingRunsProvider";
 
 // Services
 import { verifyAndProcessCast } from "@/services/user";
+
+// Error handling
+import {
+  handleSubmissionError,
+  isErrorResponse,
+  UserFriendlyError,
+} from "@/shared/utils/errorHandling";
 
 interface RunnerNavigationBarProps {}
 
@@ -33,21 +39,9 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
     embeds: string[];
   } | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationResult, setVerificationResult] = useState<{
-    success: boolean;
-    verified: boolean;
-    isWorkoutImage: boolean;
-    replyData?: {
-      castHash: string;
-      text: string;
-      message: string;
-    };
-    run?: {
-      distanceMeters?: number;
-      duration?: number;
-    };
-    message: string;
-  } | null>(null);
+  const [verificationResult, setVerificationResult] = useState<any>(null);
+  const [submissionError, setSubmissionError] =
+    useState<UserFriendlyError | null>(null);
 
   const isActive = (path: string) => {
     const currentPath = window.location.pathname;
@@ -65,11 +59,10 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
     sdk.haptics.selectionChanged();
 
     try {
-      console.log("COMPOSING A NEW CAT");
       // Open cast composer
       const response = await sdk.actions.composeCast({
-        text: "[insert run details and screenshots here]",
-        embeds: [],
+        text: "",
+        embeds: ["https://runnercoin.lat"],
         channelKey: "running",
       });
 
@@ -106,26 +99,84 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
 
           console.log("Cast verification response:", verificationResponse);
 
-          setVerificationResult(verificationResponse);
+          // Check if response is an error
+          if (isErrorResponse(verificationResponse)) {
+            console.error(
+              "❌ Cast verification failed:",
+              verificationResponse.error
+            );
+
+            // Handle the structured error response
+            const errorDetails = handleSubmissionError(
+              verificationResponse.error,
+              {
+                trackAnalytics: true,
+                onRetry: () => {
+                  // Retry functionality - could reopen cast composer or retry processing
+                  setSubmissionError(null);
+                  setShowProcessingScreen(false);
+                  setProcessingData(null);
+                  setVerificationResult(null);
+                },
+                onSignUp: () => {
+                  // Navigate to sign up or account creation
+                  setSubmissionError(null);
+                  setShowProcessingScreen(false);
+                  // Could navigate to a sign-up flow or show instructions
+                },
+              }
+            );
+
+            setSubmissionError(errorDetails);
+            setVerificationResult(verificationResponse);
+            setIsVerifying(false);
+          } else {
+            // Success case
+            setVerificationResult(verificationResponse);
+            setIsVerifying(false);
+            setSubmissionError(null);
+
+            // Show result in processing screen
+            if (verificationResponse.verified) {
+              console.log("✅ Cast verified and processed successfully");
+              // Refresh workout feed to show new verified cast
+              window.dispatchEvent(new CustomEvent("refreshWorkouts"));
+            } else {
+              console.log(
+                "❌ Cast verification failed:",
+                verificationResponse.message
+              );
+            }
+          }
+        } catch (err: any) {
+          console.error("Cast verification error:", err);
           setIsVerifying(false);
 
-          // Show result in processing screen
-          if (verificationResponse.verified) {
-            console.log("✅ Cast verified and processed successfully");
-          } else {
-            console.log(
-              "❌ Cast verification failed:",
-              verificationResponse.message
-            );
-          }
-        } catch (verificationError) {
-          console.error("Cast verification error:", verificationError);
-          setIsVerifying(false);
+          // Handle network or unexpected errors
+          const networkError = handleSubmissionError(
+            {
+              type: err.type,
+              message: err.message,
+              code: err.code,
+              statusCode: err.statusCode,
+            },
+            {
+              trackAnalytics: true,
+              onRetry: () => {
+                setSubmissionError(null);
+                setShowProcessingScreen(false);
+                setProcessingData(null);
+                setVerificationResult(null);
+              },
+            }
+          );
+
+          setSubmissionError(networkError);
           setVerificationResult({
             success: false,
             verified: false,
             isWorkoutImage: false,
-            message: "Failed to verify cast. Please try again.",
+            message: networkError.message,
           });
         }
       }
@@ -139,6 +190,7 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
     setProcessingData(null);
     setIsVerifying(false);
     setVerificationResult(null);
+    setSubmissionError(null);
     navigate("/");
   };
 
@@ -151,11 +203,12 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
             [styles.active]: isActive("/"),
           })}
           onClick={() => {
+            sdk.haptics.impactOccurred("light");
             navigate("/");
           }}
         >
           <div className={styles.iconWrapper}>
-            <HomeIcon className={styles.icon} />
+            <FaHome className={styles.icon} />
           </div>
         </button>
 
@@ -165,7 +218,7 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
           onClick={handleClickLogRun}
         >
           <div className={styles.runIconWrapper}>
-            <RunningIcon className={styles.runIcon} />
+            <FaRunning className={styles.runIcon} />
           </div>
         </button>
 
@@ -175,11 +228,12 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
             [styles.active]: isActive("/leaderboard"),
           })}
           onClick={() => {
+            sdk.haptics.impactOccurred("medium");
             navigate("/leaderboard");
           }}
         >
           <div className={styles.iconWrapper}>
-            <LeaderboardIcon className={styles.icon} />
+            <FaTrophy className={styles.icon} />
           </div>
         </button>
       </div>
@@ -192,6 +246,7 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
           embeds={processingData.embeds}
           isVerifying={isVerifying}
           verificationResult={verificationResult}
+          submissionError={submissionError}
           onComplete={handleProcessingComplete}
         />
       )}

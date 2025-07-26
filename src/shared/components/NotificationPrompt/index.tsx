@@ -23,10 +23,10 @@ const NotificationPrompt: React.FC<NotificationPromptProps> = ({
             size={20}
             className={styles.successTitle}
           >
-            $runner added
+            $runner miniapp added
           </Typography>
           <Typography size={14} className={styles.successText}>
-            You’ll get updates from $runner.
+            You’ll get a notification every time someone finishes a run.
           </Typography>
         </div>
       </div>

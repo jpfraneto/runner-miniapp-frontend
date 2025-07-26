@@ -1,11 +1,11 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import sdk from "@farcaster/frame-sdk";
 import AppLayout from "@/shared/layouts/AppLayout";
+import { useSmartNavigation } from "@/shared/hooks/navigation/useSmartNavigation";
 import styles from "./ChannelMembershipPage.module.scss";
 
 const ChannelMembershipPage: React.FC = () => {
-  const navigate = useNavigate();
+  const { goBack } = useSmartNavigation();
 
   const handleJoinChannel = () => {
     sdk.haptics.selectionChanged();
@@ -16,7 +16,7 @@ const ChannelMembershipPage: React.FC = () => {
 
   const handleGoBack = () => {
     sdk.haptics.selectionChanged();
-    navigate(-1);
+    goBack();
   };
 
   return (

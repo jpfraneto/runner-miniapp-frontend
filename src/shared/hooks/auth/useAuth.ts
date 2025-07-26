@@ -1,5 +1,6 @@
 // Dependencies
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 // Services
 import { getMe } from "@/services/auth";
@@ -17,13 +18,14 @@ import { useContext } from "react";
  * - User creation for first-time users
  * - Profile updates and voting status
  *
- * The hook only executes when both the QuickAuth token and miniapp context
- * are available, ensuring proper initialization order.
+ * For TBA clients, it provides a special authentication flow with a custom login screen.
  *
- * @returns Query object containing user data, loading state, and error information
+ * @returns Query object containing user data, loading state, error information, and TBA state
  */
 export const useAuth = () => {
-  const { token, miniappContext, isInitialized } = useContext(AuthContext);
+  const { token, miniappContext, isInitialized, signIn } =
+    useContext(AuthContext);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   // Add debug logging to track when hook is called and context state
   console.log("useAuth hook called with:", {
@@ -32,7 +34,23 @@ export const useAuth = () => {
     isInitialized,
   });
 
-  return useQuery({
+  const TBA_FID = 309857;
+  const isTBAClient = Number(miniappContext?.client.clientFid) === TBA_FID;
+
+  const handleTBALogin = async () => {
+    if (isLoggingIn) return;
+
+    try {
+      setIsLoggingIn(true);
+      await signIn();
+    } catch (error) {
+      console.error("TBA login failed:", error);
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const authQuery = useQuery({
     queryKey: ["auth"],
     queryFn: getMe,
     retry: 1, // Retry once on failure
@@ -40,4 +58,13 @@ export const useAuth = () => {
     // Only fetch when we have both token and context, and miniapp is initialized
     enabled: !!token && !!miniappContext && isInitialized,
   });
+
+  return {
+    ...authQuery,
+    isTBAClient,
+    isLoggingIn,
+    handleTBALogin,
+    miniappContext,
+    showTBALogin: isTBAClient && !token && isInitialized,
+  };
 };

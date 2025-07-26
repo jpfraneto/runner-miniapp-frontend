@@ -6,6 +6,7 @@ import { useState, useEffect, createContext } from "react";
 import { BottomSheetProvider } from "./BottomSheetProvider";
 import { ModalProvider } from "./ModalProvider";
 import { ProcessingRunsProvider } from "./ProcessingRunsProvider";
+import { UnitsProvider } from "./UnitsProvider";
 
 // Farcaster Miniapp Init
 import sdk, { type Context } from "@farcaster/frame-sdk";
@@ -14,14 +15,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // Services
 import { setFarcasterToken } from "../utils/auth";
 
-// Hooks
-import {
-  useTodaysMission,
-  type TodaysMissionData,
-} from "@/shared/hooks/user/useTodaysMission";
-
 // Types
-import { RunningSession } from "@/shared/types/running";
 
 export const AuthContext = createContext<{
   token: string | undefined;
@@ -29,18 +23,12 @@ export const AuthContext = createContext<{
   signOut: () => void;
   miniappContext: Context.FrameContext | null;
   isInitialized: boolean;
-  todaysMission: TodaysMissionData | null;
-  refreshMission: () => void;
-  updateMissionAfterCompletion: (runningSession: RunningSession) => void;
 }>({
   token: undefined,
   signIn: async () => {},
   signOut: () => {},
   miniappContext: null,
   isInitialized: false,
-  todaysMission: null,
-  refreshMission: () => {},
-  updateMissionAfterCompletion: () => {},
 });
 
 const queryClient = new QueryClient();
@@ -64,10 +52,6 @@ export function AppProvider(): JSX.Element {
     useState<Context.FrameContext | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Mission data management
-  const { todaysMission, refreshMission, updateMissionAfterCompletion } =
-    useTodaysMission();
-
   useEffect(() => {
     async function initMiniapp() {
       if (isInitialized) return;
@@ -81,6 +65,7 @@ export function AppProvider(): JSX.Element {
         setToken(newToken);
         setFarcasterToken(newToken);
         console.log("QuickAuth token obtained");
+        console.log("The route of the miniapp is", window.location);
 
         // Signal that miniapp is ready
         await sdk.actions.ready();
@@ -137,18 +122,17 @@ export function AppProvider(): JSX.Element {
           signOut,
           miniappContext,
           isInitialized,
-          todaysMission,
-          refreshMission,
-          updateMissionAfterCompletion,
         }}
       >
-        <BottomSheetProvider>
-          <ModalProvider>
-            <ProcessingRunsProvider>
-              <Outlet />
-            </ProcessingRunsProvider>
-          </ModalProvider>
-        </BottomSheetProvider>
+        <UnitsProvider>
+          <BottomSheetProvider>
+            <ModalProvider>
+              <ProcessingRunsProvider>
+                <Outlet />
+              </ProcessingRunsProvider>
+            </ModalProvider>
+          </BottomSheetProvider>
+        </UnitsProvider>
       </AuthContext.Provider>
     </QueryClientProvider>
   );

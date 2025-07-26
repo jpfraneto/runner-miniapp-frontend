@@ -20,7 +20,7 @@ const HomePageRunner = () => {
              * eip155:10/native
              */
             buyToken:
-              "eip8453:10/erc20:0x18b6f6049A0af4Ed2BBe0090319174EeeF89f53a",
+              "eip8453:8453/erc20:0x18b6f6049A0af4Ed2BBe0090319174EeeF89f53a",
             /**
              * Sell token amount, as numeric string.
              * For example, 1 USDC: 1000000

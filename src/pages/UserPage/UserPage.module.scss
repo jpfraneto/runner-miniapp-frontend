@@ -1,27 +1,45 @@
 .container {
-  max-width: 800px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 20px;
 }
 
-.backButton {
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.adminButton {
   background: none;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
-  padding: 8px 16px;
-  color: #6b7280;
+  padding: 8px;
+  color: #ff6b35;
   cursor: pointer;
-  font-size: 14px;
-  margin-bottom: 20px;
+  font-size: 16px;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
+    background: #fff5f2;
+    border-color: #ff6b35;
+    color: #ff4500;
   }
 }
 
-.loading, .error {
+.loading,
+.error {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,19 +59,55 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .profileHeader {
-  background: white;
+  background: linear-gradient(180deg, #2a1810 0%, #1a0f08 100%);
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 20px;
   margin-bottom: 24px;
+  position: relative;
+}
+
+.profileContent {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.shareButton {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 8px;
+  color: #ff6b35;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+
+  &:hover {
+    background: rgba(255, 107, 53, 0.1);
+    border-color: #ff6b35;
+    color: #ff4500;
+  }
 }
 
 .avatar {
@@ -71,7 +125,7 @@
   margin: 0 0 16px 0;
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
 }
 
 .stats {
@@ -87,25 +141,90 @@
   display: block;
   font-size: 20px;
   font-weight: 700;
-  color: #1f2937;
+  color: #ffffff;
   line-height: 1.2;
 }
 
 .statLabel {
   display: block;
   font-size: 12px;
-  color: #6b7280;
+  color: #ffffff;
   margin-top: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .section {
-  h2 {
-    margin: 0 0 16px 0;
-    font-size: 20px;
-    font-weight: 600;
-    color: #1a1a1a;
+  margin-top: 20px;
+}
+
+.adminSection {
+  margin: 24px 0;
+}
+
+// Loading screen styles
+.loadingContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.loadingRunner {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #ff6b35 0%, #ff4500 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+}
+
+.runnerGif {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: brightness(1.2);
+}
+
+.loadingText {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+// Traveling runner styles
+.travelingRunner {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.travelingRunnerGif {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8)) brightness(1.2);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
   }
 }
 
@@ -115,9 +234,18 @@
   }
 
   .profileHeader {
+    padding: 20px;
+  }
+
+  .profileContent {
     flex-direction: column;
     text-align: center;
-    padding: 20px;
+  }
+
+  .shareButton {
+    position: absolute;
+    top: 16px;
+    right: 16px;
   }
 
   .stats {
@@ -132,4 +260,125 @@
   .statValue {
     font-size: 18px;
   }
+}
+
+// Admin Modal Styles
+.adminInfo {
+  text-align: center;
+
+  .warningIcon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ff6b35;
+    font-family: "Courier New", monospace;
+    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.8);
+  }
+
+  p {
+    margin: 0 0 24px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #cccccc;
+    font-family: "Courier New", monospace;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.errorMessage {
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  border: 2px solid #cc3600;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 16px 0;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+.inputContainer {
+  margin: 16px 0;
+  width: 100%;
+}
+
+.castHashInput {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #2a1810, #1a0f08);
+  border: 2px solid #654321;
+  border-radius: 8px;
+  color: #ffcc00;
+  font-size: 14px;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.05),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3);
+
+  &::placeholder {
+    color: #888888;
+    font-style: italic;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #ffcc00;
+    box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.05),
+      inset -2px -2px 0px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 204, 0, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.resetButton {
+  background: linear-gradient(135deg, #ff6b35, #ff4500);
+  border: 2px solid #cc3600;
+  border-radius: 8px;
+  padding: 12px 24px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: "Courier New", monospace;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.8);
+  transition: all 0.2s ease;
+  box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.2),
+    inset -2px -2px 0px rgba(0, 0, 0, 0.3);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ff7f50, #ff5722);
+    transform: translateY(1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(2px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

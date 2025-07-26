@@ -1,195 +1,126 @@
-// Dependencies
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import sdk from "@farcaster/frame-sdk";
-
-// Components
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import AppLayout from "@/shared/layouts/AppLayout";
-import Typography from "@/shared/components/Typography";
-import Button from "@/shared/components/Button";
-import IconButton from "@/shared/components/IconButton";
-import LoaderIndicator from "@/shared/components/LoaderIndicator";
-import ShareRunView from "@/shared/components/ShareRunView";
-import ShareSuccessView from "@/shared/components/ShareSuccessView";
-
-// Hooks
+import WorkoutsFeed from "@/shared/components/WorkoutsFeed";
+import { RunningSession } from "@/shared/types/running";
 import { useRunningSessionByCastHash } from "@/shared/hooks/user/useRunningSessionByCastHash";
-
-// Assets
-import ShareIcon from "@/shared/assets/icons/share-icon.svg?react";
-import ArrowLeftIcon from "@/shared/assets/icons/go-back-icon.svg?react";
-
-// Types  
-import { RunShareVerificationResponse } from "@/services/user";
-
-// StyleSheet
+import { useSmartNavigation } from "@/shared/hooks/navigation/useSmartNavigation";
 import styles from "./RunningSessionDetail.module.scss";
 
 interface RunningSessionDetailProps {
   castHash: string;
 }
 
-type ViewState = 'detail' | 'share' | 'shareSuccess';
-
 const RunningSessionDetail: React.FC<RunningSessionDetailProps> = ({
   castHash,
 }) => {
-  const navigate = useNavigate();
-  const [currentView, setCurrentView] = useState<ViewState>('detail');
-  const [shareVerificationResult, setShareVerificationResult] = useState<RunShareVerificationResponse | null>(null);
-  
+  const { goBack } = useSmartNavigation();
+  const [userWorkouts, setUserWorkouts] = useState<RunningSession[]>([]);
+  const [userStats, setUserStats] = useState<{
+    username: string;
+    pfpUrl: string;
+    totalKm: number;
+    totalRuns: number;
+    avgPace: string;
+  } | null>(null);
+  const [travelingToTarget, setTravelingToTarget] = useState(false);
+  const [showRunner, setShowRunner] = useState(false);
+  const targetRunRef = useRef<HTMLDivElement>(null);
+
+  // Use the existing hook to fetch the target run
   const {
-    data: runningSession,
-    isLoading,
+    data: targetRun,
+    isLoading: loading,
     error,
   } = useRunningSessionByCastHash(castHash);
 
-  // Handle navigation back
-  const handleGoBack = () => {
-    navigate("/");
+  useEffect(() => {
+    // Once user workouts are loaded and target run is found, start the journey
+    if (userWorkouts.length > 0 && targetRun && !travelingToTarget) {
+      const timer = setTimeout(() => {
+        setTravelingToTarget(true);
+        setShowRunner(true);
+
+        // After runner animation, scroll to target
+        const scrollTimer = setTimeout(() => {
+          targetRunRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+
+          // Hide runner after reaching target
+          const hideTimer = setTimeout(() => {
+            setShowRunner(false);
+          }, 2000);
+
+          return () => clearTimeout(hideTimer);
+        }, 2000);
+
+        return () => clearTimeout(scrollTimer);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [userWorkouts, targetRun, travelingToTarget]);
+
+  const handleWorkoutsDataFetched = (workouts: RunningSession[]) => {
+    setUserWorkouts(workouts);
+
+    if (workouts.length > 0) {
+      const firstWorkout = workouts[0];
+      const totalKm = workouts.reduce(
+        (sum, workout) => sum + workout.distanceMeters / 1000,
+        0
+      );
+      const totalRuns = workouts.length;
+
+      const totalMinutes = workouts.reduce(
+        (sum, workout) => sum + workout.duration,
+        0
+      );
+      const avgPaceMinutes = totalMinutes / totalKm;
+      const avgPace = `${avgPaceMinutes.toFixed(2)} min/km`;
+
+      setUserStats({
+        username: firstWorkout.user.username,
+        pfpUrl: firstWorkout.user.pfpUrl,
+        totalKm,
+        totalRuns,
+        avgPace,
+      });
+    }
   };
 
-  // Handle share on Farcaster
-  const handleShare = () => {
-    setCurrentView('share');
-  };
-
-  const handleSkipShare = () => {
-    setCurrentView('detail');
-  };
-
-  const handleShareSuccess = (result: RunShareVerificationResponse) => {
-    setShareVerificationResult(result);
-    setCurrentView('shareSuccess');
-  };
-
-  const handleShareSuccessComplete = () => {
-    setCurrentView('detail');
-  };
-
-  // Format time
-  const formatTime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
-
-  // Format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  // Handle different view states
-  if (currentView === 'share' && runningSession) {
-    return (
-      <ShareRunView
-        runData={runningSession}
-        onSkip={handleSkipShare}
-        onSuccess={handleShareSuccess}
-      />
-    );
-  }
-
-  if (currentView === 'shareSuccess' && shareVerificationResult) {
-    return (
-      <ShareSuccessView
-        verificationResult={shareVerificationResult}
-        onContinue={handleShareSuccessComplete}
-      />
-    );
-  }
-
-  if (isLoading) {
+  if (loading || !targetRun) {
     return (
       <AppLayout>
-        <div className={styles.loadingContainer}>
-          <LoaderIndicator />
-          <Typography
-            variant="geist"
-            weight="medium"
-            size={16}
-            className={styles.loadingText}
-          >
-            Loading running session...
-          </Typography>
+        <div className={styles.container}>
+          <div className={styles.loadingContainer}>
+            <div className={styles.loadingRectangle}>
+              <img
+                src="/runner.gif"
+                alt="Loading..."
+                className={styles.runnerGif}
+              />
+            </div>
+            <p className={styles.loadingText}>Time traveling to run...</p>
+          </div>
         </div>
       </AppLayout>
     );
   }
 
   if (error) {
-    const isNotFound =
-      error.message?.includes("404") || error.message?.includes("not found");
-    const isServerError =
-      error.message?.includes("500") || error.message?.includes("server error");
-
     return (
       <AppLayout>
-        <div className={styles.errorContainer}>
-          <Typography
-            variant="geist"
-            weight="medium"
-            size={18}
-            className={styles.errorTitle}
-          >
-            {isNotFound ? "Running Session Not Found" : "Error Loading Session"}
-          </Typography>
-          <Typography
-            variant="geist"
-            weight="regular"
-            size={14}
-            className={styles.errorText}
-          >
-            {isNotFound
-              ? "This running session doesn't exist or has been removed."
-              : isServerError
-              ? "Server error occurred. Please try again later."
-              : "Failed to load the running session. Please try again."}
-          </Typography>
-          <Button
-            variant="primary"
-            caption="Go Back"
-            onClick={handleGoBack}
-            className={styles.errorButton}
-          />
-        </div>
-      </AppLayout>
-    );
-  }
-
-  if (!runningSession) {
-    return (
-      <AppLayout>
-        <div className={styles.errorContainer}>
-          <Typography
-            variant="geist"
-            weight="medium"
-            size={18}
-            className={styles.errorTitle}
-          >
-            No Data Available
-          </Typography>
-          <Typography
-            variant="geist"
-            weight="regular"
-            size={14}
-            className={styles.errorText}
-          >
-            No running session data was found for this cast.
-          </Typography>
-          <Button
-            variant="primary"
-            caption="Go Back"
-            onClick={handleGoBack}
-            className={styles.errorButton}
-          />
+        <div className={styles.container}>
+          <div className={styles.errorContainer}>
+            <h2>Run not found</h2>
+            <p>The run you're looking for doesn't exist or has been removed.</p>
+            <button onClick={goBack} className={styles.backButton}>
+              ← Go Back
+            </button>
+          </div>
         </div>
       </AppLayout>
     );
@@ -198,240 +129,103 @@ const RunningSessionDetail: React.FC<RunningSessionDetailProps> = ({
   return (
     <AppLayout>
       <div className={styles.container}>
-        {/* Header */}
-        <div className={styles.header}>
-          <IconButton
-            variant="secondary"
-            icon={<ArrowLeftIcon />}
-            onClick={handleGoBack}
-            className={styles.backButton}
-          />
-          <Typography
-            variant="gta"
-            weight="wide"
-            size={40}
-            className={styles.title}
-          >
-            Running Session
-          </Typography>
-        </div>
+        <button onClick={goBack} className={styles.backButton}>
+          ← Back
+        </button>
 
-        {/* Content */}
-        <div className={styles.content}>
-          {/* User Info */}
-          {runningSession.user && (
+        {/* Traveling Runner Animation */}
+        <AnimatePresence>
+          {showRunner && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={styles.userCard}
-            >
-              <div className={styles.userInfo}>
-                <img
-                  src={runningSession.user.pfpUrl}
-                  alt={runningSession.user.username}
-                  className={styles.userAvatar}
-                />
-                <div className={styles.userDetails}>
-                  <Typography
-                    variant="geist"
-                    weight="medium"
-                    size={16}
-                    className={styles.username}
-                  >
-                    @{runningSession.user.username}
-                  </Typography>
-                  <Typography
-                    variant="geist"
-                    weight="regular"
-                    size={14}
-                    className={styles.userFid}
-                  >
-                    FID: {runningSession.user.fid}
-                  </Typography>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Session Summary */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className={styles.summaryCard}
-          >
-            <div className={styles.summaryHeader}>
-              <Typography
-                variant="geist"
-                weight="medium"
-                size={14}
-                className={styles.dateText}
-              >
-                {formatDate(
-                  runningSession.completedDate || new Date().toISOString()
-                )}
-              </Typography>
-            </div>
-
-            <div className={styles.metricsGrid}>
-              <div className={styles.metric}>
-                <Typography
-                  variant="gta"
-                  weight="wide"
-                  size={32}
-                  className={styles.metricValue}
-                >
-                  {runningSession.distance}
-                </Typography>
-                <Typography
-                  variant="geist"
-                  weight="regular"
-                  size={12}
-                  className={styles.metricLabel}
-                >
-                  km
-                </Typography>
-              </div>
-              <div className={styles.metric}>
-                <Typography
-                  variant="gta"
-                  weight="wide"
-                  size={32}
-                  className={styles.metricValue}
-                >
-                  {formatTime(Number(runningSession.duration))}
-                </Typography>
-                <Typography
-                  variant="geist"
-                  weight="regular"
-                  size={12}
-                  className={styles.metricLabel}
-                >
-                  time
-                </Typography>
-              </div>
-              <div className={styles.metric}>
-                <Typography
-                  variant="gta"
-                  weight="wide"
-                  size={32}
-                  className={styles.metricValue}
-                >
-                  {runningSession.pace}
-                </Typography>
-                <Typography
-                  variant="geist"
-                  weight="regular"
-                  size={12}
-                  className={styles.metricLabel}
-                >
-                  pace
-                </Typography>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Intervals (if available) */}
-          {runningSession.intervals && runningSession.intervals.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className={styles.intervalsCard}
-            >
-              <Typography
-                variant="geist"
-                weight="medium"
-                size={16}
-                className={styles.sectionTitle}
-              >
-                Intervals ({runningSession.intervals.length})
-              </Typography>
-
-              <div className={styles.intervalsList}>
-                {runningSession.intervals.map((interval: any, index: number) => (
-                  <div key={index} className={styles.intervalItem}>
-                    <div className={styles.intervalHeader}>
-                      <Typography variant="geist" weight="medium" size={14}>
-                        Interval {index + 1}
-                      </Typography>
-                      <Typography variant="geist" weight="regular" size={12}>
-                        {interval.distance}km •{" "}
-                        {formatTime(Number(interval.duration))}
-                      </Typography>
-                    </div>
-                    {interval.pace && (
-                      <Typography variant="geist" weight="regular" size={12}>
-                        Pace: {interval.pace}/km
-                      </Typography>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-
-          {/* Screenshots (if available) */}
-          {runningSession.screenshotUrls &&
-            runningSession.screenshotUrls.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className={styles.galleryCard}
-              >
-                <Typography
-                  variant="geist"
-                  weight="medium"
-                  size={16}
-                  className={styles.sectionTitle}
-                >
-                  Workout Screenshots ({runningSession.screenshotUrls.length})
-                </Typography>
-
-                <div className={styles.galleryGrid}>
-                  {runningSession.screenshotUrls.map(
-                    (url: string, index: number) => (
-                      <div key={index} className={styles.galleryItem}>
-                        <img
-                          src={url}
-                          alt={`Workout screenshot ${index + 1}`}
-                          className={styles.galleryImage}
-                        />
-                      </div>
-                    )
-                  )}
-                </div>
-              </motion.div>
-            )}
-        </div>
-
-        {/* Actions */}
-        <div className={styles.actions}>
-          <Button
-            variant="secondary"
-            caption="Share"
-            onClick={handleShare}
-            iconLeft={<ShareIcon />}
-            className={styles.shareButton}
-          />
-          {runningSession?.castHash && (
-            <button
-              className={styles.viewCastButton}
-              onClick={() => {
-                if (runningSession.castHash) {
-                  sdk.actions.viewCast({
-                    hash: runningSession.castHash,
-                  });
-                }
+              initial={{
+                position: "fixed",
+                top: "20px",
+                left: "50%",
+                transform: "translateX(-50%) rotate(90deg)",
+                zIndex: 1000,
               }}
+              animate={{
+                top: targetRunRef.current
+                  ? `${targetRunRef.current.offsetTop + window.scrollY}px`
+                  : "50vh",
+              }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 2, ease: "easeInOut" }}
+              className={styles.travelingRunner}
             >
-              View Cast
-            </button>
+              <img
+                src="/runner.gif"
+                alt="Traveling through time..."
+                className={styles.travelingRunnerGif}
+              />
+            </motion.div>
           )}
+        </AnimatePresence>
+
+        {userStats && (
+          <div className={styles.profileHeader}>
+            <img
+              src={userStats.pfpUrl}
+              alt={userStats.username}
+              className={styles.avatar}
+            />
+            <div className={styles.userInfo}>
+              <h1 className={styles.username}>{userStats.username}</h1>
+              <div className={styles.stats}>
+                <div className={styles.stat}>
+                  <span className={styles.statValue}>
+                    {userStats.totalKm.toFixed(1)} km
+                  </span>
+                  <span className={styles.statLabel}>total distance</span>
+                </div>
+                <div className={styles.stat}>
+                  <span className={styles.statValue}>
+                    {userStats.totalRuns}
+                  </span>
+                  <span className={styles.statLabel}>total runs</span>
+                </div>
+                <div className={styles.stat}>
+                  <span className={styles.statValue}>{userStats.avgPace}</span>
+                  <span className={styles.statLabel}>avg pace</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.section}>
+          <WorkoutsFeedWrapper
+            targetRun={targetRun}
+            targetRunRef={targetRunRef}
+            onDataFetched={handleWorkoutsDataFetched}
+          />
         </div>
       </div>
     </AppLayout>
+  );
+};
+
+// Custom WorkoutsFeed wrapper to highlight target run
+const WorkoutsFeedWrapper: React.FC<{
+  targetRun: RunningSession;
+  targetRunRef: React.RefObject<HTMLDivElement>;
+  onDataFetched: (workouts: RunningSession[]) => void;
+}> = ({ targetRun, targetRunRef, onDataFetched }) => {
+  return (
+    <div className={styles.workoutsFeedWrapper}>
+      <WorkoutsFeed
+        type="user"
+        userId={targetRun.fid}
+        limit={100}
+        onDataFetched={onDataFetched}
+        highlightCastHash={targetRun.castHash}
+        onHighlightedItemRef={(ref) => {
+          if (ref) {
+            (targetRunRef as any).current = ref;
+          }
+        }}
+      />
+    </div>
   );
 };
 
