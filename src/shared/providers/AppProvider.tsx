@@ -1,19 +1,25 @@
 // Dependencies
-import { Outlet } from "react-router-dom";
-import { useState, useEffect, createContext } from "react";
+import { Outlet } from 'react-router-dom';
+import { useState, useEffect, createContext } from 'react';
 
 // Providers
-import { BottomSheetProvider } from "./BottomSheetProvider";
-import { ModalProvider } from "./ModalProvider";
-import { ProcessingRunsProvider } from "./ProcessingRunsProvider";
-import { UnitsProvider } from "./UnitsProvider";
+import { BottomSheetProvider } from './BottomSheetProvider';
+import { ModalProvider } from './ModalProvider';
+import { ProcessingRunsProvider } from './ProcessingRunsProvider';
+import { UnitsProvider } from './UnitsProvider';
 
 // Farcaster Miniapp Init
-import sdk, { type Context } from "@farcaster/frame-sdk";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import sdk, { type Context } from '@farcaster/frame-sdk';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Services
-import { setFarcasterToken } from "../utils/auth";
+import { setFarcasterToken } from '../utils/auth';
+
+// Utils
+import { isFarcasterMiniapp } from '../utils/miniappDetection';
+
+// Pages
+import LandingPage from '../../pages/LandingPage';
 
 // Types
 
@@ -23,13 +29,13 @@ export const AuthContext = createContext<{
   signOut: () => void;
   miniappContext: Context.FrameContext | null;
   isInitialized: boolean;
-}>({
-  token: undefined,
-  signIn: async () => {},
-  signOut: () => {},
-  miniappContext: null,
-  isInitialized: false,
-});
+    }>({
+      token: undefined,
+      signIn: async () => {},
+      signOut: () => {},
+      miniappContext: null,
+      isInitialized: false,
+    });
 
 const queryClient = new QueryClient();
 
@@ -51,40 +57,47 @@ export function AppProvider(): JSX.Element {
   const [miniappContext, setMiniappContext] =
     useState<Context.FrameContext | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isMiniapp, setIsMiniapp] = useState<boolean | null>(null);
 
   useEffect(() => {
-    async function initMiniapp() {
-      if (isInitialized) return;
+    async function checkMiniapp() {
+      // Check if running in Farcaster miniapp environment
+      const miniappDetected = await isFarcasterMiniapp();
+      setIsMiniapp(miniappDetected);
 
+      if (!miniappDetected) {
+        // Not in a miniapp, skip initialization
+        setIsInitialized(true);
+        return;
+      }
+
+      // If we detected a miniapp, initialize it
       try {
-        console.log("Initializing Farcaster miniapp...");
+        console.log('Initializing Farcaster miniapp...');
 
         // Obtain QuickAuth token from Farcaster
         const { token: newToken } = await sdk.quickAuth.getToken();
-        console.log("THE NEW TOKEN IS", newToken);
+        console.log('THE NEW TOKEN IS', newToken);
         setToken(newToken);
         setFarcasterToken(newToken);
-        console.log("QuickAuth token obtained");
-        console.log("The route of the miniapp is", window.location);
-
-        // Signal that miniapp is ready
-        await sdk.actions.ready();
+        console.log('QuickAuth token obtained');
+        console.log('The route of the miniapp is', window.location);
 
         // Load miniapp context (user profile, etc.)
         const context = await sdk.context;
-        console.log("Miniapp context loaded:", context.user.username);
+        console.log('Miniapp context loaded:', context.user.username);
         setMiniappContext(context);
 
         // Backend authentication happens automatically when useAuth calls /me
         // The /me endpoint will create/update user and return profile data
         setIsInitialized(true);
       } catch (error) {
-        console.error("Failed to initialize miniapp:", error);
+        console.error('Failed to initialize miniapp:', error);
         setIsInitialized(false);
       }
     }
 
-    initMiniapp();
+    checkMiniapp();
   }, [isInitialized]);
 
   const signIn = async () => {
@@ -99,9 +112,9 @@ export function AppProvider(): JSX.Element {
       setMiniappContext(context);
 
       // Clear and refetch auth data - /me will handle user creation/update
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
     } catch (error) {
-      console.error("Failed to sign in:", error);
+      console.error('Failed to sign in:', error);
     }
   };
 
@@ -112,6 +125,16 @@ export function AppProvider(): JSX.Element {
     // Clear all cached data
     queryClient.clear();
   };
+
+  // Show landing page if not in miniapp
+  if (isMiniapp === false) {
+    return <LandingPage />;
+  }
+
+  // Show loading while detecting environment
+  if (isMiniapp === null) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

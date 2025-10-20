@@ -12,7 +12,8 @@
   "dependencies": {
     "@farcaster/auth-kit": "^0.6.0",
     "@farcaster/frame-sdk": "^0.0.61",
-    "@tanstack/react-query": "^5.45.1",
+    "@farcaster/miniapp-sdk": "^0.2.1",
+    "@tanstack/react-query": "^5.83.1",
     "axios": "^1.7.2",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
@@ -22,7 +23,7 @@
     "react-confetti": "^6.1.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.2.1",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^7.7.1",
     "react-use": "^17.5.0",
     "zustand": "^4.5.2"
   },

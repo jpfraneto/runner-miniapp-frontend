@@ -8,7 +8,7 @@ import RunningSessionPage from "../pages/RunningSessionPage";
 import LeaderboardPage from "@/pages/LeaderboardPage";
 import UserPage from "@/pages/UserPage";
 import AdminAutomationPage from "@/pages/AdminAutomationPage";
-
+import { CastRoutePage } from "@/pages/CastRoutePage";
 // Providers
 import { AppProvider } from "../shared/providers/AppProvider";
 
@@ -26,6 +26,7 @@ export const router = createBrowserRouter([
       },
       { path: "/run/:castHash", element: <RunningSessionPage /> },
       { path: "/user/:fid", element: <UserPage /> },
+      { path: "/cast/:hash", element: <CastRoutePage /> },
       { path: "/leaderboard", element: <LeaderboardPage /> },
       { path: "/admin/automation", element: <AdminAutomationPage /> },
       { path: "*", element: <NotFoundPage /> },

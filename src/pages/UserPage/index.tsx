@@ -10,6 +10,7 @@ import { useUnits } from "@/shared/providers/UnitsProvider";
 import { useAuth } from "@/shared/hooks/auth/useAuth";
 import { useAdmin } from "@/shared/hooks/admin/useAdmin";
 import { FaCog, FaShare } from "react-icons/fa";
+import ConfirmModal from "@/shared/components/ConfirmModal";
 import styles from "./UserPage.module.scss";
 import LoaderIndicator from "@/shared/components/LoaderIndicator";
 import sdk from "@farcaster/frame-sdk";
@@ -21,11 +22,12 @@ const UserPage: React.FC = () => {
   const { goBack } = useSmartNavigation();
   const { formatDistance, convertPace } = useUnits();
   const { miniappContext } = useAuth();
-  const { processCastHash, isProcessing, error, clearError } = useAdmin();
+  const { isAdmin, processCastHash, banUserByFid, isProcessing, isBanningUser, error, clearError } = useAdmin();
   const targetRunRef = useRef<HTMLDivElement | null>(null);
   const [showRunner, setShowRunner] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
+  const [showBanModal, setShowBanModal] = useState(false);
 
   // Check if the current user is admin (FID 16098) and viewing their own profile
   const isAdminViewingOwnProfile =
@@ -142,6 +144,17 @@ const UserPage: React.FC = () => {
     if (success) {
       setShowAdminModal(false);
       setCastHashInput("");
+    }
+  };
+
+  const handleBanUser = async () => {
+    if (!fid || !userStats) return;
+    
+    const success = await banUserByFid(parseInt(fid));
+    if (success) {
+      setShowBanModal(false);
+      // Refresh the workouts to reflect the ban
+      window.dispatchEvent(new CustomEvent("refreshWorkouts"));
     }
   };
 
@@ -265,13 +278,24 @@ const UserPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            <button
-              onClick={handleShareProfile}
-              className={styles.shareButton}
-              title="Share profile"
-            >
-              <FaShare />
-            </button>
+            <div className={styles.profileActions}>
+              <button
+                onClick={handleShareProfile}
+                className={styles.shareButton}
+                title="Share profile"
+              >
+                <FaShare />
+              </button>
+              {isAdmin && userStats && fid !== miniappContext?.user.fid?.toString() && (
+                <button
+                  onClick={() => setShowBanModal(true)}
+                  className={styles.banButton}
+                  title="Ban user"
+                >
+                  BAN
+                </button>
+              )}
+            </div>
           </div>
         )}
 
@@ -336,6 +360,19 @@ const UserPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Ban User Modal */}
+      <ConfirmModal
+        isOpen={showBanModal}
+        onClose={() => setShowBanModal(false)}
+        onConfirm={handleBanUser}
+        title="Ban User"
+        message={`Are you sure you want to ban @${userStats?.username}? This will delete all their runs and prevent them from participating.`}
+        confirmText="Ban User"
+        cancelText="Cancel"
+        isLoading={isBanningUser}
+        variant="danger"
+      />
     </AppLayout>
   );
 };

@@ -61,9 +61,8 @@ const RunnerNavigationBar: React.FC<RunnerNavigationBarProps> = () => {
     try {
       // Open cast composer
       const response = await sdk.actions.composeCast({
-        text: "",
+        text: "[add screenshots and running session info here. then delete this and cast]",
         embeds: ["https://runnercoin.lat"],
-        channelKey: "running",
       });
 
       console.log("Cast response:", response);

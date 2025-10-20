@@ -7,7 +7,9 @@ import {
 } from "@/services/runnerAPI";
 import { useNavigate } from "react-router-dom";
 import sdk from "@farcaster/frame-sdk";
-import { FaEye, FaShare } from "react-icons/fa";
+import { FaEye, FaShare, FaTrash } from "react-icons/fa";
+import { useAdmin } from "@/shared/hooks/admin/useAdmin";
+import ConfirmModal from "@/shared/components/ConfirmModal";
 import styles from "./WorkoutsFeed.module.scss";
 import LoaderIndicator from "../LoaderIndicator";
 import { RunningSession } from "@/shared/types/running";
@@ -43,10 +45,13 @@ const WorkoutsFeed: React.FC<WorkoutsFeedProps> = ({
 }) => {
   const navigate = useNavigate();
   const { convertDistance, convertPace } = useUnits();
+  const { isAdmin, deleteRunByHash, isDeletingRun } = useAdmin();
   const [workouts, setWorkouts] = useState<RunningSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [runToDelete, setRunToDelete] = useState<{ castHash: string; username: string } | null>(null);
 
   const fetchWorkouts = async () => {
     try {
@@ -217,6 +222,24 @@ const WorkoutsFeed: React.FC<WorkoutsFeedProps> = ({
         .padStart(2, "0")}`;
     } else {
       return `${mins}:${secs.toString().padStart(2, "0")}`;
+    }
+  };
+
+  const handleDeleteRun = (castHash: string, username: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRunToDelete({ castHash, username });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteRun = async () => {
+    if (!runToDelete) return;
+    
+    const success = await deleteRunByHash(runToDelete.castHash);
+    if (success) {
+      setShowDeleteModal(false);
+      setRunToDelete(null);
+      // Refresh the workouts feed
+      fetchWorkouts();
     }
   };
 
@@ -412,13 +435,24 @@ const WorkoutsFeed: React.FC<WorkoutsFeedProps> = ({
                         </div>
 
                         <div className={styles.actionsColumn}>
-                          <button
-                            className={styles.actionButton}
-                            onClick={(e) => handleViewCast(workout.castHash, e)}
-                            title="View cast"
-                          >
-                            <FaEye />
-                          </button>
+                          <div className={styles.topActionRow}>
+                            {isAdmin && (
+                              <button
+                                className={`${styles.actionButton} ${styles.deleteButton}`}
+                                onClick={(e) => handleDeleteRun(workout.castHash, workout.user.username, e)}
+                                title="Delete run"
+                              >
+                                <FaTrash />
+                              </button>
+                            )}
+                            <button
+                              className={styles.actionButton}
+                              onClick={(e) => handleViewCast(workout.castHash, e)}
+                              title="View cast"
+                            >
+                              <FaEye />
+                            </button>
+                          </div>
                           <button
                             className={styles.actionButton}
                             onClick={(e) =>
@@ -468,6 +502,22 @@ const WorkoutsFeed: React.FC<WorkoutsFeedProps> = ({
           )}
         </>
       )}
+
+      {/* Delete Run Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setRunToDelete(null);
+        }}
+        onConfirm={confirmDeleteRun}
+        title="Delete Run"
+        message={`Are you sure you want to delete @${runToDelete?.username}'s run? This action cannot be undone.`}
+        confirmText="Delete Run"
+        cancelText="Cancel"
+        isLoading={isDeletingRun}
+        variant="danger"
+      />
     </div>
   );
 };

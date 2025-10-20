@@ -70,17 +70,19 @@ const CastProcessingScreen: React.FC<CastProcessingScreenProps> = ({
           onComplete(response.data);
         } else {
           console.error("Failed to process cast:", response.message);
-          // Handle error - could show error state or retry
-          setProcessingComplete(true);
-          setCurrentView("complete");
-          setShowNotificationPrompt(true);
+          // If cast was created but processing failed, still redirect to feed
+          // The cast is already on Farcaster, user can see it in the feed
+          console.log("Cast was created but processing failed, redirecting to feed");
+          onComplete();
+          navigate("/");
         }
       } catch (error) {
         console.error("Error processing cast:", error);
-        // Handle error - could show error state or retry
-        setProcessingComplete(true);
-        setCurrentView("complete");
-        setShowNotificationPrompt(true);
+        // If we reach here, the cast was likely created but there was a processing error
+        // Since the cast exists on Farcaster, redirect to feed where user can see it
+        console.log("Cast processing threw error, redirecting to feed");
+        onComplete();
+        navigate("/");
       }
     };
 
